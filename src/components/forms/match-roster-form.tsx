@@ -12,8 +12,9 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
+  // FormLabel, // No longer needed here as Label is imported directly
 } from "@/components/ui/form";
+import { Label } from "@/components/ui/label"; // Added import
 import {
   Select,
   SelectContent,
