@@ -72,7 +72,7 @@ export function Header({
                   variant="outline"
                   size="sm"
                   onClick={onLogout}
-                  className="border-accent text-primary-foreground hover:bg-accent/80"
+                  className="border-accent text-accent hover:bg-accent/80 hover:text-primary-foreground font-semibold"
                 >
                   登出 ({currentUserRole})
                 </Button>
