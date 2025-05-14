@@ -54,7 +54,7 @@ export function Header({
                     variant="outline"
                     size="sm"
                     onClick={onLoginAsPlayer}
-                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground"
+                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground font-semibold"
                   >
                     球員登入
                   </Button>
@@ -62,7 +62,7 @@ export function Header({
                     variant="outline"
                     size="sm"
                     onClick={onLoginAsCoach}
-                    className="border-secondary text-primary-foreground hover:bg-secondary/80"
+                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground font-semibold"
                   >
                     教練登入
                   </Button>
