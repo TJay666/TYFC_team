@@ -152,6 +152,13 @@ export function MatchesSection({
     }).filter(Boolean);
   };
 
+  const getRequiredPlayersForFormat = (format: string | undefined): number => {
+    if (!format) return 0;
+    if (format.includes("5人制")) return 5;
+    if (format.includes("8人制")) return 8;
+    if (format.includes("11人制")) return 11;
+    return 0;
+  };
 
   return (
     <div>
@@ -229,6 +236,11 @@ export function MatchesSection({
                   const opponent = appData.teams.find(t => t.id === match.opponentTeamId);
                   const conflict = matchConflicts[match.id] || { type: 'none' };
                   
+                  const currentRosterCount = (appData.matchRosters[match.id] || []).length;
+                  const matchFormat = league?.format;
+                  const requiredPlayers = getRequiredPlayersForFormat(matchFormat);
+                  const showRosterWarning = currentRosterCount < requiredPlayers && requiredPlayers > 0;
+
                   return (
                     <TableRow key={match.id} 
                       className={cn({
@@ -251,8 +263,22 @@ export function MatchesSection({
                             <Button variant="ghost" size="icon" onClick={() => handleEditMatch(match)} className="hover:text-primary">
                               <Edit3 className="h-4 w-4" />
                             </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openRosterModal(match)} className="hover:text-yellow-500">
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => openRosterModal(match)} 
+                              className="hover:text-yellow-500 relative"
+                              title={`管理陣容 (${currentRosterCount} / ${requiredPlayers > 0 ? requiredPlayers : 'N/A'})`}
+                            >
                               <Users className="h-4 w-4" />
+                              {currentRosterCount > 0 && (
+                                <span className="absolute -top-1.5 -right-1.5 bg-accent text-accent-foreground text-xs w-4 h-4 rounded-full flex items-center justify-center border border-background">
+                                  {currentRosterCount}
+                                </span>
+                              )}
+                              {showRosterWarning && (
+                                <AlertTriangle className="absolute -bottom-1 -right-1 h-3.5 w-3.5 text-destructive fill-destructive/70" />
+                              )}
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => openStatsModal(match)} className="btn-success hover:text-green-600">
                               <BarChart2 className="h-4 w-4" />
