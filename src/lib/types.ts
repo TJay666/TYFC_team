@@ -67,12 +67,14 @@ export interface AppData {
 export type PlayerPosition = 
   | "守門員 (GK)" | "右後衛 (RB)" | "左後衛 (LB)" | "中後衛 (CB)" 
   | "防守中場 (DMF)" | "右中場 (RMF)" | "左中場 (LMF)" | "進攻中場 (AMF)"
-  | "右邊鋒 (RWF)" | "左邊鋒 (LWF)" | "中鋒 (CF)";
+  | "右邊鋒 (RWF)" | "左邊鋒 (LWF)" | "中鋒 (CF)"
+  | "左前鋒" | "右前鋒" | "中前鋒";
 
 export const playerPositionOptions: PlayerPosition[] = [
   "守門員 (GK)", "右後衛 (RB)", "左後衛 (LB)", "中後衛 (CB)", 
   "防守中場 (DMF)", "右中場 (RMF)", "左中場 (LMF)", "進攻中場 (AMF)",
-  "右邊鋒 (RWF)", "左邊鋒 (LWF)", "中鋒 (CF)"
+  "右邊鋒 (RWF)", "左邊鋒 (LWF)", "中鋒 (CF)",
+  "左前鋒", "右前鋒", "中前鋒"
 ];
 
 export type AgeGroup = "幼兒組" | "國小組" | "國中組" | "高中組" | "大學組" | "成人組" | "all";
