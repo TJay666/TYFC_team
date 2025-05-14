@@ -54,7 +54,7 @@ export function Header({
                     variant="outline"
                     size="sm"
                     onClick={onLoginAsPlayer}
-                    className="border-secondary text-primary-foreground hover:bg-secondary/80"
+                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground"
                   >
                     球員登入
                   </Button>
