@@ -4,27 +4,27 @@
 
 @layer base {
   :root {
-    /* Light Theme (Deep Blue focus, adjusted for light background) */
-    --background: 220 60% 96%; /* Very Light Blue-ish Gray */
-    --foreground: 220 40% 10%; /* Dark Blue/Black Text */
+    /* Light Theme (Inspired by Deep Blue, with Gold Accent) */
+    --background: 210 60% 97%; /* Very Light Cool Gray/Blue */
+    --foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
 
     --card: 0 0% 100%; /* White */
-    --card-foreground: 220 40% 10%; /* Dark Blue/Black Text */
+    --card-foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
 
     --popover: 0 0% 100%; /* White */
-    --popover-foreground: 220 40% 10%; /* Dark Blue/Black Text */
+    --popover-foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
 
-    --primary: 220 75% 50%; /* Strong, Deep Blue */
+    --primary: 215 70% 48%; /* Strong, Saturated Blue */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 220 60% 70%; /* Softer, Lighter Blue */
-    --secondary-foreground: 220 40% 10%; /* Dark Blue/Black Text for contrast */
+    --secondary: 210 65% 70%; /* Softer, Lighter Blue */
+    --secondary-foreground: 215 40% 15%; /* Dark Blue/Black Text for contrast */
 
-    --muted: 220 50% 90%; /* Light Muted Blue-Gray */
-    --muted-foreground: 220 30% 45%; /* Medium Blue-Gray */
+    --muted: 210 50% 92%; /* Light Muted Blue-Gray */
+    --muted-foreground: 215 30% 50%; /* Medium Blue-Gray */
 
-    --accent: 48 95% 50%; /* Gold */
-    --accent-foreground: 240 10% 10%; /* Dark Blue/Black for text on accent */
+    --accent: 45 90% 50%; /* Gold/Yellow */
+    --accent-foreground: 240 10% 10%; /* Dark for text on accent */
     
     --destructive: 0 72% 51%; /* Red */
     --destructive-foreground: 0 0% 100%; /* White */
@@ -33,87 +33,87 @@
     --success-foreground: 0 0% 100%; /* White */
     
     --warning: 38 92% 50%; /* Orange */
-    --warning-foreground: 240 10% 10%; /* Dark Blue/Black */
+    --warning-foreground: 240 10% 10%; /* Dark */
 
-    --border: 220 40% 88%; /* Medium-Light Blue-Gray Border */
-    --input: 220 40% 92%; /* Lighter for input borders on light bg */
-    --ring: 220 75% 55%; /* Brighter Blue for focus rings, related to primary */
+    --border: 210 40% 88%; /* Medium-Light Blue-Gray Border */
+    --input: 210 40% 93%; /* Lighter for input borders on light bg */
+    --ring: 215 70% 55%; /* Brighter Blue for focus rings, related to primary */
 
     --radius: 0.5rem;
 
     /* Custom variables, can be themed if needed */
-    --conflict-warning-bg: #fff3e0; /* Light orange */
-    --conflict-error-bg: #ffebee;   /* Light red */
+    --conflict-warning-bg: #fff3e0; /* Light orange - kept for now, can be themed */
+    --conflict-error-bg: #ffebee;   /* Light red - kept for now, can be themed */
     --disabled-bg: #e9ecef;
     --disabled-text: #6c757d;
 
-    --chart-1: 220 75% 50%; /* Primary Blue */
-    --chart-2: 190 70% 50%; /* Cyan/Teal */
-    --chart-3: 280 60% 60%; /* Purple */
-    --chart-4: 48 95% 50%; /* Accent Gold */
-    --chart-5: 0 60% 60%;   /* Reddish */
+    --chart-1: 215 70% 50%; /* Primary Blue */
+    --chart-2: 190 65% 50%; /* Cyan/Teal */
+    --chart-3: 270 55% 60%; /* Purple (complementary) */
+    --chart-4: 45 90% 50%; /* Accent Gold */
+    --chart-5: 0 55% 60%;   /* Reddish (complementary) */
 
     /* Sidebar Colors for Light Theme */
-    --sidebar-background: 220 30% 25%; /* Darker Blue for contrast sidebar */
-    --sidebar-foreground: 220 30% 95%; /* Very Light Blue for text */
+    --sidebar-background: 215 35% 28%; /* Darker Blue for contrast sidebar */
+    --sidebar-foreground: 210 30% 95%; /* Very Light Blue/White for text */
     --sidebar-primary: 0 0% 100%; /* White for active item background */
-    --sidebar-primary-foreground: 220 30% 25%; /* Dark Blue for active item text */
-    --sidebar-accent: 220 75% 50%; /* Primary Blue for hover (matches main primary) */
+    --sidebar-primary-foreground: 215 35% 28%; /* Dark Blue for active item text */
+    --sidebar-accent: 215 70% 48%; /* Primary Blue for hover (matches main primary) */
     --sidebar-accent-foreground: 0 0% 100%; /* White for hover text */
-    --sidebar-border: 220 30% 20%; /* Darker Blue for border */
-    --sidebar-ring: 48 95% 50%; /* Accent Gold for ring */
+    --sidebar-border: 215 35% 22%; /* Darker Blue for border */
+    --sidebar-ring: 45 90% 50%; /* Accent Gold for ring */
   }
 
   .dark {
-    /* Dark Theme (Even Deeper Blue focus) */
-    --background: 220 45% 7%; /* Darker and slightly more saturated Navy */
-    --foreground: 210 30% 92%; /* Light Grayish Blue for text */
+    /* Dark Theme (Based on Deep Blue Image Color ~HSL(213, 50%, 25%)) */
+    --background: 213 48% 12%; /* Very Dark Deep Blue */
+    --foreground: 210 35% 88%; /* Light Grayish Blue for text */
 
-    --card: 220 40% 10%; /* Darker Navy Card */
-    --card-foreground: 210 30% 90%; /* Light Grayish Blue */
+    --card: 213 45% 18%; /* Darker Deep Blue Card */
+    --card-foreground: 210 35% 85%; /* Light Grayish Blue */
 
-    --popover: 220 40% 8%; /* Darker Navy Popover */
-    --popover-foreground: 210 30% 90%; /* Light Grayish Blue */
+    --popover: 213 45% 15%; /* Darkest Deep Blue Popover */
+    --popover-foreground: 210 35% 85%; /* Light Grayish Blue */
 
-    --primary: 220 80% 60%; /* Deep, Saturated Blue */
-    --primary-foreground: 220 20% 98%; /* Very Light/White for contrast on primary */
+    --primary: 213 65% 55%; /* Brighter, Saturated Deep Blue (for actions) */
+    --primary-foreground: 210 25% 98%; /* Very Light/White for contrast on primary */
 
-    --secondary: 220 50% 50%; /* Muted, Deeper Blue */
-    --secondary-foreground: 210 30% 95%; /* Very Light Blue/White */
+    --secondary: 213 55% 40%; /* Muted, Deep Blue (closer to image color) */
+    --secondary-foreground: 210 35% 92%; /* Very Light Blue/White */
 
-    --muted: 220 35% 18%; /* Dark Slate Blue */
-    --muted-foreground: 210 30% 65%; /* Medium Grayish Blue */
+    --muted: 213 40% 25%; /* Dark Slate Blue (image color as muted bg) */
+    --muted-foreground: 210 35% 70%; /* Medium Grayish Blue */
 
-    --accent: 48 100% 55%; /* Bright Gold */
-    --accent-foreground: 220 50% 10%; /* Near Black for text on accent */
+    --accent: 45 95% 55%; /* Bright Gold/Yellow */
+    --accent-foreground: 220 40% 10%; /* Near Black for text on accent */
 
-    --destructive: 0 63% 50%; /* Vivid Red */
+    --destructive: 0 65% 55%; /* Vivid Red */
     --destructive-foreground: 0 0% 98%; /* Light text on destructive */
 
-    --success: 140 70% 45%; /* Brighter Green */
+    --success: 140 65% 45%; /* Brighter Green */
     --success-foreground: 0 0% 5%; /* Dark text on success */
     
-    --warning: 40 100% 55%; /* Brighter Orange */
+    --warning: 40 95% 55%; /* Brighter Orange */
     --warning-foreground: 0 0% 5%; /* Dark text on warning */
 
-    --border: 220 35% 22%; /* Darker Muted Blue Border */
-    --input: 220 35% 28%; /* Slightly lighter for input borders on dark bg */
-    --ring: 220 80% 65%; /* Brightest Blue for focus rings, related to primary */
+    --border: 213 40% 30%; /* Darker Muted Blue Border */
+    --input: 213 40% 22%; /* Slightly lighter for input borders on dark bg */
+    --ring: 213 65% 60%; /* Brightest Blue for focus rings, related to primary */
 
     --conflict-warning-bg: 45 100% 20%; /* Dark yellow/brown for warning background */
     --conflict-error-bg: 0 70% 25%;   /* Dark red for error background */
-    --disabled-bg: 220 30% 20%;
-    --disabled-text: 210 30% 50%;
+    --disabled-bg: 213 35% 22%;
+    --disabled-text: 210 30% 55%;
 
     /* Sidebar Colors for Dark Theme */
-    --sidebar-background: 220 40% 8%; /* Dark Navy for sidebar (matches popover) */
-    --sidebar-foreground: 210 30% 88%; /* Light Grayish Blue for text */
-    --sidebar-primary: 220 80% 60%;    /* Primary Blue for active item background (matches main primary) */
-    --sidebar-primary-foreground: 220 20% 98%; /* White for active item text (matches main primary-foreground) */
-    --sidebar-accent: 220 60% 50%; /* Medium Blue for hover */
+    --sidebar-background: 213 45% 15%; /* Dark Deep Blue for sidebar (matches popover) */
+    --sidebar-foreground: 210 35% 88%; /* Light Grayish Blue for text */
+    --sidebar-primary: 213 65% 55%;    /* Primary Blue for active item background (matches main primary) */
+    --sidebar-primary-foreground: 210 25% 98%; /* White for active item text (matches main primary-foreground) */
+    --sidebar-accent: 213 60% 45%; /* Medium Deep Blue for hover */
     --sidebar-accent-foreground: 0 0% 95%; /* Light text for hover */
-    --sidebar-border: 220 40% 6%;  /* Very Dark Navy for border */
-    --sidebar-ring: 48 100% 55%; /* Accent Gold for ring */
+    --sidebar-border: 213 45% 10%;  /* Very Dark Deep Blue for border */
+    --sidebar-ring: 45 95% 55%; /* Accent Gold for ring */
   }
 }
 
