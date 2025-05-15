@@ -56,12 +56,17 @@ export interface MatchRoster {
   [matchId: string]: MatchRosterItem[];
 }
 
+export type MatchAvailability = {
+  [matchId: string]: { [playerId: string]: boolean };
+};
+
 export interface AppData {
   matches: Match[];
   leagues: League[];
   teams: Team[];
   players: Player[];
   matchRosters: MatchRoster;
+  matchAvailability: MatchAvailability; // Added
 }
 
 export type PlayerPosition = 

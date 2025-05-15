@@ -20,22 +20,21 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push('/'); // Redirect to main app page if already authenticated
+      router.push('/'); 
     }
   }, [isAuthenticated, authLoading, router]);
 
   const handlePlayerLogin = () => {
-    // In a real app, you'd validate username/password
-    login(USER_ROLES.PLAYER, username || '球員A');
+    // For demo, using player1's ID from initialDb. In real app, this ID comes from auth backend.
+    login(USER_ROLES.PLAYER, username || '球員A', 'player1'); 
   };
 
   const handleCoachLogin = () => {
-    // In a real app, you'd validate username/password
-    login(USER_ROLES.COACH, username || '教練B');
+    // For demo, using a generic coach ID.
+    login(USER_ROLES.COACH, username || '教練B', 'coach1'); 
   };
 
   if (authLoading || isAuthenticated) {
-     // Show loading or null if already authenticated and redirecting
     return (
         <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4">
             <p className="text-gray-400">載入中或重定向...</p>
@@ -45,15 +44,14 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-      {/* User needs to place TYFC_login.png in public/app/login/ */}
       <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
             <Image
-              src="/app/login/TYFC_login.png" 
-              alt="TYFC Logo"
-              width={150}
-              height={150}
+              src="/images/taoyuan_universe_logo.png" 
+              alt="獵鷹 Logo"
+              width={120}
+              height={120}
               className="rounded-full shadow-lg"
               data-ai-hint="football club logo"
               priority

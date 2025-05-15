@@ -9,8 +9,9 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 interface AuthContextType {
   currentUserRole: UserRole | null;
   username: string | null;
+  currentUserId: string | null; // Added
   isAuthenticated: boolean;
-  login: (role: UserRole, username: string) => void;
+  login: (role: UserRole, username: string, userId: string) => void; // Modified
   logout: () => void;
 }
 
@@ -19,42 +20,48 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null); // Added
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [loading, setLoading] = useState<boolean>(true); // To prevent flicker on initial load
+  const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
 
   useEffect(() => {
-    // Try to load auth state from localStorage on initial mount
     const storedRole = localStorage.getItem('currentUserRole') as UserRole | null;
     const storedUsername = localStorage.getItem('username');
-    if (storedRole && storedUsername) {
+    const storedUserId = localStorage.getItem('currentUserId'); // Added
+    if (storedRole && storedUsername && storedUserId) {
       setCurrentUserRole(storedRole);
       setUsername(storedUsername);
+      setCurrentUserId(storedUserId); // Added
       setIsAuthenticated(true);
     }
     setLoading(false);
   }, []);
 
-  const login = (role: UserRole, loggedInUsername: string) => {
+  const login = (role: UserRole, loggedInUsername: string, userId: string) => { // Modified
     setCurrentUserRole(role);
     setUsername(loggedInUsername);
+    setCurrentUserId(userId); // Added
     setIsAuthenticated(true);
     localStorage.setItem('currentUserRole', role);
     localStorage.setItem('username', loggedInUsername);
-    router.push('/'); // Redirect to main app page after login
+    localStorage.setItem('currentUserId', userId); // Added
+    router.push('/');
   };
 
   const logout = () => {
     setCurrentUserRole(null);
     setUsername(null);
+    setCurrentUserId(null); // Added
     setIsAuthenticated(false);
     localStorage.removeItem('currentUserRole');
     localStorage.removeItem('username');
-    router.push('/login'); // Redirect to login page after logout
+    localStorage.removeItem('currentUserId'); // Added
+    router.push('/login');
   };
 
   return (
-    <AuthContext.Provider value={{ currentUserRole, username, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={{ currentUserRole, username, currentUserId, isAuthenticated, login, logout }}>
       {!loading && children}
     </AuthContext.Provider>
   );

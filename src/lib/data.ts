@@ -24,5 +24,9 @@ export const initialDb: AppData = {
   ],
   matchRosters: { 
     "match1": [{playerId: "player1", position: "中鋒 (CF)"}, {playerId: "player2", position: "中後衛 (CB)"}]
+  },
+  matchAvailability: { // Added
+    "match1": { "player1": true, "player2": false }, // Example: Player1 available, Player2 not for match1
+    "match2": { "player1": true } 
   }
 };

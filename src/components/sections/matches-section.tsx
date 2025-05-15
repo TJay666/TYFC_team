@@ -1,24 +1,27 @@
-"use client";
 
+"use client";
 import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox"; // Added for availability
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { Match, League, Team, UserRole, MatchConflictInfo, AppData } from '@/lib/types';
+import { USER_ROLES } from '@/lib/types'; // Added
+import { useAuth } from '@/contexts/auth-context'; // Added
 import { MatchForm } from '@/components/forms/match-form';
 import { MatchRosterForm } from '@/components/forms/match-roster-form';
 import { MatchStatsForm } from '@/components/forms/match-stats-form';
-import { PlusCircle, Edit3, Users, BarChart2, Trash2, AlertTriangle, XCircle } from 'lucide-react';
+import { PlusCircle, Edit3, Users, BarChart2, Trash2, AlertTriangle, XCircle, CheckSquare, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MatchesSectionProps {
   appData: AppData;
   setAppData: React.Dispatch<React.SetStateAction<AppData>>;
-  currentUserRole: UserRole;
+  currentUserRole: UserRole; // This is the role from AuthProvider, not necessarily the one from appData.currentUser
   onOpenConfirmDialog: (title: string, description: string, onConfirm: () => void) => void;
   filteredMatches: Match[];
   filteredLeagues: League[];
@@ -36,6 +39,8 @@ export function MatchesSection({
   globalGroupIndicator,
   matchConflicts,
 }: MatchesSectionProps) {
+  const { currentUserId } = useAuth(); // Get current logged-in player's ID
+
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
   const [isStatsModalOpen, setIsStatsModalOpen] = useState(false);
@@ -90,7 +95,8 @@ export function MatchesSection({
       setAppData(prev => ({
         ...prev,
         matches: prev.matches.filter(m => m.id !== matchId),
-        matchRosters: { ...prev.matchRosters, [matchId]: undefined! } // Remove roster too
+        matchRosters: { ...prev.matchRosters, [matchId]: undefined! },
+        matchAvailability: { ...prev.matchAvailability, [matchId]: undefined! } // Also remove availability
       }));
     });
   };
@@ -123,8 +129,20 @@ export function MatchesSection({
     }));
     setIsStatsModalOpen(false);
   };
+
+  const handleAvailabilityChange = (matchId: string, playerId: string, isAvailable: boolean) => {
+    setAppData(prev => {
+      const newAvailability = { ...prev.matchAvailability };
+      if (!newAvailability[matchId]) {
+        newAvailability[matchId] = {};
+      }
+      newAvailability[matchId][playerId] = isAvailable;
+      return { ...prev, matchAvailability: newAvailability };
+    });
+  };
   
-  const isActionDisabled = currentUserRole === 'player' || currentUserRole === 'guest';
+  const isCoachOrAdmin = currentUserRole === USER_ROLES.COACH; // Simplified for now
+  // Player role specific UI will be handled differently
 
   const displayedMatches = useMemo(() => {
     return filteredMatches.filter(match => {
@@ -148,8 +166,8 @@ export function MatchesSection({
     const rosterItems = appData.matchRosters[match.id] || [];
     return rosterItems.map(item => {
       const player = appData.players.find(p => p.id === item.playerId);
-      return { ...player!, position: item.position }; // Assume player exists
-    }).filter(Boolean);
+      return { ...player!, position: item.position }; 
+    }).filter(p => p && p.id); // Ensure player exists and has an ID
   };
 
   const getRequiredPlayersForFormat = (format: string | undefined): number => {
@@ -166,7 +184,7 @@ export function MatchesSection({
         <h2 className="text-3xl font-bold text-primary">
           比賽管理 <span className="text-xl text-secondary">{globalGroupIndicator}</span>
         </h2>
-        {!isActionDisabled && (
+        {isCoachOrAdmin && (
           <Dialog open={isMatchModalOpen} onOpenChange={setIsMatchModalOpen}>
             <DialogTrigger asChild>
               <Button onClick={handleAddMatch} className="bg-primary hover:bg-primary/90">
@@ -200,7 +218,7 @@ export function MatchesSection({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">所有聯賽</SelectItem>
-                  {filteredLeagues.map((league) => ( // Use filteredLeagues for consistency with global filter
+                  {filteredLeagues.map((league) => (
                     <SelectItem key={league.id} value={league.id}>{league.name}</SelectItem>
                   ))}
                 </SelectContent>
@@ -227,7 +245,8 @@ export function MatchesSection({
                   <TableHead>聯賽</TableHead>
                   <TableHead>對手</TableHead>
                   <TableHead>地點</TableHead>
-                  {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
+                  {currentUserRole === USER_ROLES.PLAYER && <TableHead className="text-center w-[80px]">出席</TableHead>}
+                  {isCoachOrAdmin && <TableHead className="text-right">操作</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -241,11 +260,14 @@ export function MatchesSection({
                   const requiredPlayers = getRequiredPlayersForFormat(matchFormat);
                   const showRosterWarning = currentRosterCount < requiredPlayers && requiredPlayers > 0;
 
+                  const isPlayerAvailable = currentUserId ? appData.matchAvailability[match.id]?.[currentUserId] || false : false;
+
                   return (
                     <TableRow key={match.id} 
                       className={cn({
                         'bg-[var(--conflict-error-bg)]': conflict.type === 'overlap',
                         'bg-[var(--conflict-warning-bg)]': conflict.type === 'sameday',
+                        'hidden-for-player-role': currentUserRole === USER_ROLES.PLAYER && !isCoachOrAdmin && isActionDisabled, // Hide actions for player
                       })}
                     >
                       <TableCell className="p-1 text-center">
@@ -257,7 +279,21 @@ export function MatchesSection({
                       <TableCell>{league ? league.name : 'N/A'}</TableCell>
                       <TableCell>{opponent ? opponent.name : 'N/A'}</TableCell>
                       <TableCell>{match.location}</TableCell>
-                      {!isActionDisabled && (
+                      
+                      {currentUserRole === USER_ROLES.PLAYER && (
+                        <TableCell className="text-center">
+                          {currentUserId && (
+                            <Checkbox
+                              id={`availability-${match.id}-${currentUserId}`}
+                              checked={isPlayerAvailable}
+                              onCheckedChange={(checked) => handleAvailabilityChange(match.id, currentUserId, !!checked)}
+                              aria-label={`Mark availability for match on ${match.date}`}
+                            />
+                          )}
+                        </TableCell>
+                      )}
+
+                      {isCoachOrAdmin && (
                         <TableCell className="text-right">
                           <div className="flex justify-end space-x-1">
                             <Button variant="ghost" size="icon" onClick={() => handleEditMatch(match)} className="hover:text-primary">
@@ -299,7 +335,6 @@ export function MatchesSection({
         </CardContent>
       </Card>
 
-      {/* Roster Modal */}
       {currentMatchForModal && (
         <Dialog open={isRosterModalOpen} onOpenChange={setIsRosterModalOpen}>
           <DialogContent className="sm:max-w-md">
@@ -316,12 +351,12 @@ export function MatchesSection({
               initialRoster={appData.matchRosters[currentMatchForModal.id] || []}
               onSubmit={handleRosterFormSubmit}
               userRole={currentUserRole}
+              matchAvailabilityForCurrentMatch={appData.matchAvailability[currentMatchForModal.id]}
             />
           </DialogContent>
         </Dialog>
       )}
 
-      {/* Stats Modal */}
       {currentMatchForModal && (
          <Dialog open={isStatsModalOpen} onOpenChange={setIsStatsModalOpen}>
           <DialogContent className="sm:max-w-lg">
