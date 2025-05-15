@@ -4,42 +4,42 @@
 
 @layer base {
   :root {
-    /* Light Theme - TeamTactics Style */
-    --background: 220 20% 97%;    /* Light Gray: F5F5F5 */
-    --foreground: 220 10% 25%;     /* Dark Gray for text */
+    /* Light Theme - Adjusted to match "桃園獵鷹宇宙" app */
+    --background: 210 17% 98%;   /* App's body background: #f8f9fa */
+    --foreground: 0 0% 20%;     /* App's body text: #333333 */
 
-    --card: 0 0% 100%;            /* White for cards */
-    --card-foreground: 220 10% 25%; /* Dark Gray for card text */
+    --card: 0 0% 100%;           /* App's card background: #ffffff */
+    --card-foreground: 0 0% 20%; /* App's card text: #333333 */
 
-    --popover: 0 0% 100%;          /* White for popovers */
-    --popover-foreground: 220 10% 25%; /* Dark Gray for popover text */
+    --popover: 0 0% 100%;         /* Assuming white like cards */
+    --popover-foreground: 0 0% 20%; /* Assuming default text color */
 
-    --primary: 120 60% 34%;       /* Forest Green: 228B22 */
+    --primary: 215 53% 23%;      /* App's --primary: #1d3557 */
     --primary-foreground: 0 0% 100%; /* White for text on primary */
 
-    --secondary: 120 40% 50%;     /* Lighter Green */
-    --secondary-foreground: 0 0% 100%; /* White for text on secondary */
+    --secondary: 208 39% 44%;    /* App's --secondary: #457b9d */
+    --secondary-foreground: 0 0% 100%; /* White for text on secondary buttons */
 
-    --muted: 220 20% 90%;         /* Lighter Gray for muted elements */
-    --muted-foreground: 220 10% 50%;  /* Medium Gray for muted text */
+    --muted: 210 17% 93%;        /* App's global filters bg: #e9ecef */
+    --muted-foreground: 210 10% 48%; /* App's disabled text: #6c757d */
 
-    --accent: 51 100% 50%;        /* Gold: FFD700 */
-    --accent-foreground: 220 10% 20%; /* Dark text for contrast on gold */
+    --accent: 45 75% 66%;        /* App's --warning (gold/yellow accent): #e9c46a */
+    --accent-foreground: 0 0% 20%; /* Dark text for contrast on gold/yellow */
     
-    --destructive: 0 70% 50%;      /* Standard Red */
+    --destructive: 355 79% 56%;  /* App's --danger (red): #e63946 */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --success: 140 60% 40%;      /* Standard Green */
+    --success: 172 57% 39%;      /* App's --success (teal/green): #2a9d8f */
     --success-foreground: 0 0% 100%; /* White */
     
-    --warning: 38 92% 50%;       /* Standard Orange/Yellow for warnings */
-    --warning-foreground: 0 0% 0%; /* Black text for contrast */
+    --warning: 45 75% 66%;       /* App's --warning (gold/yellow): #e9c46a */
+    --warning-foreground: 0 0% 20%; /* Dark text for contrast */
 
-    --border: 220 15% 85%;       /* Medium-Light Gray for borders */
-    --input: 220 15% 80%;        /* Slightly darker gray for input borders */
-    --ring: 120 60% 45%;          /* Brighter Forest Green for focus rings */
+    --border: 210 17% 90%;       /* App's table/general border: #dee2e6 */
+    --input: 0 0% 80%;           /* App's input border: #cccccc */
+    --ring: 208 39% 50%;         /* Brighter version of app's secondary for focus rings */
 
-    --radius: 0.5rem;
+    --radius: 0.5rem;            /* Consistent with app's 8px border-radius */
 
     /* Custom variables from your app, kept as hex */
     --conflict-warning-bg: #fff3e0; 
@@ -48,71 +48,68 @@
     --disabled-text: #6c757d;
 
     /* Chart colors based on app's palette */
-    --chart-1: 120 60% 34%;      /* Primary - Forest Green */
-    --chart-2: 120 40% 50%;      /* Secondary - Lighter Green */
-    --chart-3: 51 100% 50%;       /* Accent - Gold */
-    --chart-4: 140 60% 40%;       /* Success - Green */
-    --chart-5: 0 70% 50%;         /* Destructive - Red */
+    --chart-1: 215 53% 23%;      /* App's --primary */
+    --chart-2: 208 39% 44%;      /* App's --secondary */
+    --chart-3: 172 57% 39%;      /* App's --success */
+    --chart-4: 45 75% 66%;       /* App's --warning (gold) */
+    --chart-5: 355 79% 56%;      /* App's --danger (red) */
+
+    /* Sidebar Colors for Light Theme - Omitted as current app does not have this specific sidebar structure */
+    /* If you implement a sidebar later, these can be themed accordingly. */
   }
 
   .dark {
-    /* Dark Theme - Deep Gray Background */
-    --background: 210 6% 15%;    /* Deep Gray */
-    --foreground: 210 20% 90%;    /* Light Gray for text */
+    /* Dark Theme - These variables are from your original snippet. */
+    /* The current "桃園獵鷹宇宙" app does not have an explicit dark theme defined in its CSS variables. */
+    /* If you wish to create a dark theme based on the app's primary colors, these would need further adjustment. */
+    --background: 213 48% 12%; 
+    --foreground: 210 35% 88%; 
 
-    --card: 210 6% 20%;          /* Slightly Lighter Deep Gray for cards */
-    --card-foreground: 210 20% 90%; /* Light Gray for card text */
+    --card: 213 45% 18%; 
+    --card-foreground: 210 35% 85%;
 
-    --popover: 210 6% 18%;        /* Deep Gray for popovers */
-    --popover-foreground: 210 20% 90%;/* Light Gray for popover text */
+    --popover: 213 45% 15%; 
+    --popover-foreground: 210 35% 85%; 
 
-    --primary: 120 55% 45%;       /* Forest Green (adjusted for dark theme) */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 213 65% 55%; 
+    --primary-foreground: 210 25% 98%; 
 
-    --secondary: 120 40% 35%;     /* Darker Lighter Green */
-    --secondary-foreground: 0 0% 100%; /* White */
+    --secondary: 213 55% 40%; 
+    --secondary-foreground: 210 35% 92%; 
 
-    --muted: 210 6% 28%;          /* Medium Deep Gray for muted elements */
-    --muted-foreground: 210 15% 65%;  /* Lighter Gray for muted text */
+    --muted: 213 40% 25%; 
+    --muted-foreground: 210 35% 70%; 
 
-    --accent: 51 100% 60%;        /* Gold (slightly brighter for dark theme) */
-    --accent-foreground: 210 25% 15%; /* Darker text for contrast on gold */
+    --accent: 45 95% 55%; 
+    --accent-foreground: 220 40% 10%; 
+
+    --destructive: 0 65% 55%; 
+    --destructive-foreground: 0 0% 98%; 
+
+    --success: 140 65% 45%; 
+    --success-foreground: 0 0% 5%; 
     
-    --destructive: 0 60% 55%;      /* Standard Red (adjusted) */
-    --destructive-foreground: 0 0% 100%; /* White */
+    --warning: 40 95% 55%; 
+    --warning-foreground: 0 0% 5%; 
 
-    --success: 140 55% 45%;      /* Standard Green (adjusted) */
-    --success-foreground: 0 0% 100%; /* White */
-    
-    --warning: 38 90% 55%;       /* Standard Orange/Yellow (adjusted) */
-    --warning-foreground: 210 25% 10%; /* Dark text for contrast */
+    --border: 213 40% 30%; 
+    --input: 213 40% 22%; 
+    --ring: 213 65% 60%; 
 
-    --border: 210 6% 30%;         /* Dark Gray for borders */
-    --input: 210 6% 25%;          /* Dark Gray for input borders */
-    --ring: 120 55% 55%;          /* Brighter Forest Green for focus rings */
+    --conflict-warning-bg: 45 100% 20%; 
+    --conflict-error-bg: 0 70% 25%;   
+    --disabled-bg: 213 35% 22%;
+    --disabled-text: 210 30% 55%;
 
-    /* Custom variables from your app, kept as hex for now or convert if needed */
-    --conflict-warning-bg: hsl(45 100% 20%); /* Dark Gold */
-    --conflict-error-bg: hsl(0 70% 25%);   /* Dark Red */
-    --disabled-bg: hsl(210 6% 22%);
-    --disabled-text: hsl(210 15% 55%);
-
-    /* Chart colors for dark theme */
-    --chart-1: 120 55% 45%;      /* Primary */
-    --chart-2: 120 40% 35%;      /* Secondary */
-    --chart-3: 51 100% 60%;       /* Accent */
-    --chart-4: 140 55% 45%;       /* Success */
-    --chart-5: 0 60% 55%;         /* Destructive */
-
-    /* Sidebar Colors for Dark Theme (if using sidebar component) */
-    --sidebar-background: 210 6% 12%; /* Even Deeper Gray for Sidebar */
-    --sidebar-foreground: 210 20% 88%; 
-    --sidebar-primary: 120 55% 50%;    
-    --sidebar-primary-foreground: 0 0% 100%; 
-    --sidebar-accent: 51 100% 55%; 
-    --sidebar-accent-foreground: 210 25% 10%; 
-    --sidebar-border: 210 6% 20%;   
-    --sidebar-ring: 51 100% 60%; 
+    /* Sidebar Colors for Dark Theme - From your original snippet */
+    --sidebar-background: 213 45% 15%; 
+    --sidebar-foreground: 210 35% 88%; 
+    --sidebar-primary: 213 65% 55%;    
+    --sidebar-primary-foreground: 210 25% 98%; 
+    --sidebar-accent: 213 60% 45%; 
+    --sidebar-accent-foreground: 0 0% 95%; 
+    --sidebar-border: 213 45% 10%;   
+    --sidebar-ring: 45 95% 55%; 
   }
 }
 
@@ -123,38 +120,37 @@
   body {
     @apply bg-background text-foreground;
   }
-  html.dark body { 
-    @apply bg-background text-foreground; 
+  html.dark body { /* Ensure dark theme applies if html has .dark */
+    @apply bg-background text-foreground; /* Uses .dark variables */
   }
   .conflict-error {
+    /* Uses the CSS variable directly, which is now hex if defined as hex */
     background-color: var(--conflict-error-bg); 
   }
-  .conflict-warning {
-    background-color: var(--conflict-warning-bg);
-  }
-
+   /* For conflict indicators, using Tailwind utility classes might be more robust if HSL strings in vars are an issue for direct text color */
   .conflict-warning td:first-child::before {
     content: "❗ ";
-    color: hsl(var(--warning)); 
+    color: orange; /* Fallback or direct color */
     font-weight: bold;
   }
   .dark .conflict-warning td:first-child::before {
     content: "❗ ";
-    color: hsl(var(--warning)); 
+    color: hsl(var(--warning)); /* Assumes --warning contains H S% L% string */
     font-weight: bold;
   }
   .conflict-error td:first-child::before {
     content: "❌ ";
-    color: hsl(var(--destructive)); 
+    color: red; /* Fallback or direct color */
     font-weight: bold;
   }
   .dark .conflict-error td:first-child::before {
     content: "❌ ";
-    color: hsl(var(--destructive)); 
+    color: hsl(var(--destructive)); /* Assumes --destructive contains H S% L% string */
     font-weight: bold;
   }
 }
 
+/* Ensure these utilities use the HSL string variables correctly */
 .btn-success {
     @apply bg-[hsl(var(--success))] text-[hsl(var(--success-foreground))] hover:bg-[hsl(var(--success)/0.9)];
 }

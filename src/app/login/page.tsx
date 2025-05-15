@@ -45,7 +45,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
       <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
-        <CardHeader className="text-center">
+        <CardHeader className="text-center bg-card text-card-foreground">
           <div className="mx-auto mb-6">
             <Image
               src="/images/taoyuan_universe_logo.png" 
@@ -108,3 +108,4 @@ export default function LoginPage() {
     </div>
   );
 }
+
