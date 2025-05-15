@@ -45,13 +45,13 @@ export default function LoginPage() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-      {/* User needs to place taoyuan_universe_logo.png in public/images/ */}
+      {/* User needs to place TYFC_login.png in public/app/login/ */}
       <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
             <Image
-              src="/images/taoyuan_universe_logo.png" 
-              alt="獵鷹 Logo"
+              src="/app/login/TYFC_login.png" 
+              alt="TYFC Logo"
               width={150}
               height={150}
               className="rounded-full shadow-lg"
