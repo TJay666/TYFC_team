@@ -5,11 +5,12 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
 import { LogOut } from 'lucide-react';
+import Link from 'next/link'; // Import Link
+import { USER_ROLES } from '@/lib/types'; // Import USER_ROLES
 
 interface HeaderProps {
   activeTab: SectionName;
   onTabChange: (tab: SectionName) => void;
-  // currentUserRole, onLoginAsPlayer, onLoginAsCoach, onLogout are removed as they are handled by AuthContext
 }
 
 const navItems: { id: SectionName; label: string }[] = [
@@ -46,6 +47,19 @@ export function Header({
                   </Button>
                 </li>
               ))}
+              {/* Add Admin link if user is admin */}
+              {currentUserRole === USER_ROLES.ADMIN && (
+                <li>
+                  <Link href="/admin" passHref legacyBehavior>
+                    <Button
+                      variant="ghost"
+                      className="text-primary-foreground hover:bg-primary/80 hover:text-accent-foreground px-2 py-1 md:px-3 md:py-1.5"
+                    >
+                      <a>管理後台</a>
+                    </Button>
+                  </Link>
+                </li>
+              )}
               <li className="flex gap-1 md:gap-2 mt-2 md:mt-0 md:ml-4 items-center">
                 <span className="text-sm hidden md:inline">
                   角色: {currentUserRole} | 使用者: {username}
