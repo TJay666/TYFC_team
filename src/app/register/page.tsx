@@ -12,19 +12,20 @@ export default function RegisterPage() {
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
       {/* User needs to place taoyuan_universe_logo.png in public/images/ */}
       <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
-        <CardHeader className="text-center">
-           <div className="mx-auto mb-6">
+        <CardHeader className="text-center bg-gray-800 text-white">
+           <div className="mx-auto mb-6 w-32 h-32 relative">
             <Image
               src="/images/taoyuan_universe_logo.png" 
               alt="獵鷹 Logo"
-              width={120}
-              height={120}
-              className="rounded-full shadow-lg"
+              fill
+              sizes="128px"
+              className="rounded-full shadow-lg object-cover"
               data-ai-hint="football club logo"
+              priority
             />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">帳號註冊</CardTitle>
-          <CardDescription className="text-muted-foreground">感謝您有興趣加入 獵鷹宇宙！</CardDescription>
+          <CardTitle className="text-3xl font-bold text-white">帳號註冊</CardTitle>
+          <CardDescription className="text-gray-300">感謝您有興趣加入 獵鷹宇宙！</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4 text-center">
           <p className="text-card-foreground">
