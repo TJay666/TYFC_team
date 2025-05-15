@@ -1,26 +1,63 @@
 import { USER_ROLES, User } from "@/lib/types";
 
-// This is a placeholder for fetching users from your backend.
-// Replace this with actual API call.
-export const fetchUsers = async (): Promise<User[]> => {
-  console.log("Simulating fetching users...");
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 500));
+const API_BASE_URL = 'http://localhost:8000'; // Assuming your Django backend runs on this URL
 
-  // Return mock user data
-  return [
-    { id: 'user1', name: 'Admin User', role: USER_ROLES.ADMIN },
-    { id: 'user2', name: 'Coach Bob', role: USER_ROLES.COACH },
-    { id: 'user3', name: 'Player Alice', role: USER_ROLES.PLAYER },
-    { id: 'user4', name: 'Guest User', role: USER_ROLES.GUEST },
-  ];
+// Fetches users from the Django backend API.
+export const fetchUsers = async (): Promise<User[]> => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/`, {
+      headers: {
+        // Include authentication headers if needed (e.g., 'Authorization': 'Bearer YOUR_TOKEN')
+        // Replace 'YOUR_TOKEN' with the actual authentication token
+        // 'Authorization': 'Bearer YOUR_TOKEN'
+      },
+    });
+    if (!response.ok) {
+      // Handle non-2xx responses
+      console.error('Failed to fetch users:', response.statusText);
+      throw new Error(`Failed to fetch users: ${response.statusText}`);
+    }
+    const data = await response.json();
+    // Map backend data to frontend User type if necessary
+    // Assuming backend returns objects with id, username, role, email
+    return data.map((item: any) => ({
+      id: item.id.toString(), // Ensure id is string if your frontend expects string
+      name: item.username, // Assuming username is used as name
+      role: item.role as USER_ROLES, // Cast backend role string to USER_ROLES enum
+      // Add other fields as needed (e.g., email)
+    }));
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error; // Re-throw the error for frontend to handle
+  }
 };
 
-// This is a placeholder for updating a user's role on your backend.
-// Replace this with actual API call.
+// Updates a user's role on the Django backend API.
 export const updateUserRole = async (userId: string, newRole: USER_ROLES): Promise<void> => {
-  console.log(`Simulating updating user ${userId} role to ${newRole}...`);
-  // Simulate a delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-  // In a real app, you would send a request to your backend here.
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/users/${userId}/role/`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        // Include authentication headers if needed (e.g., 'Authorization': 'Bearer YOUR_TOKEN')
+        // Replace 'YOUR_TOKEN' with the actual authentication token
+        // 'Authorization': 'Bearer YOUR_TOKEN'
+      },
+      body: JSON.stringify({ role: newRole }),
+    });
+
+    if (!response.ok) {
+      // Handle non-2xx responses
+      console.error(`Failed to update user ${userId} role:`, response.statusText);
+      throw new Error(`Failed to update user role: ${response.statusText}`);
+    }
+
+    // Assuming the backend returns the updated user data, you could process it here if needed
+    // const updatedUserData = await response.json();
+    console.log(`User ${userId} role updated successfully to ${newRole}`);
+
+  } catch (error) {
+    console.error(`Error updating user ${userId} role:`, error);
+    throw error; // Re-throw the error for frontend to handle
+  }
 };
