@@ -37,47 +37,51 @@ export default function LoginPage() {
   if (authLoading || isAuthenticated) {
      // Show loading or null if already authenticated and redirecting
     return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-background p-4">
-            <p className="text-muted-foreground">載入中或重定向...</p>
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gray-900 p-4">
+            <p className="text-gray-400">載入中或重定向...</p>
         </div>
     );
   }
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-background to-muted p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
+      {/* User needs to place taoyuan_universe_logo.png in public/images/ */}
+      <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
         <CardHeader className="text-center">
           <div className="mx-auto mb-6">
             <Image
-              src="https://placehold.co/150x150.png" // Replace with your actual logo path e.g., /images/logo.png
-              alt="TeamTactics Logo"
-              width={120}
-              height={120}
+              src="/images/taoyuan_universe_logo.png" 
+              alt="獵鷹 Logo"
+              width={150}
+              height={150}
               className="rounded-full shadow-lg"
               data-ai-hint="football club logo"
+              priority
             />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">TeamTactics 登入</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">獵鷹登入</CardTitle>
           <CardDescription className="text-muted-foreground">歡迎回來！請選擇您的登入身份。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label htmlFor="username">使用者名稱 (選填)</Label>
+            <Label htmlFor="username" className="text-card-foreground">使用者名稱 (選填)</Label>
             <Input 
               id="username" 
               placeholder="請輸入您的帳號" 
               value={username}
-              onChange={(e) => setUsername(e.target.value)} 
+              onChange={(e) => setUsername(e.target.value)}
+              className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">密碼 (選填)</Label>
+            <Label htmlFor="password" className="text-card-foreground">密碼 (選填)</Label>
             <Input 
               id="password" 
               type="password" 
               placeholder="請輸入您的密碼" 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
             />
           </div>
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -100,7 +104,7 @@ export default function LoginPage() {
           </p>
         </CardFooter>
       </Card>
-       <footer className="mt-8 text-center text-sm text-foreground/70">
+       <footer className="mt-8 text-center text-sm text-gray-300">
         <p>桃園獵鷹宇宙 &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
