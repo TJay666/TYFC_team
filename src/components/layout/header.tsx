@@ -1,15 +1,15 @@
+
 "use client";
 import type { UserRole, SectionName } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/auth-context';
+import { LogOut } from 'lucide-react';
 
 interface HeaderProps {
   activeTab: SectionName;
   onTabChange: (tab: SectionName) => void;
-  currentUserRole: UserRole;
-  onLoginAsPlayer: () => void;
-  onLoginAsCoach: () => void;
-  onLogout: () => void;
+  // currentUserRole, onLoginAsPlayer, onLoginAsCoach, onLogout are removed as they are handled by AuthContext
 }
 
 const navItems: { id: SectionName; label: string }[] = [
@@ -22,64 +22,47 @@ const navItems: { id: SectionName; label: string }[] = [
 export function Header({
   activeTab,
   onTabChange,
-  currentUserRole,
-  onLoginAsPlayer,
-  onLoginAsCoach,
-  onLogout,
 }: HeaderProps) {
+  const { currentUserRole, username, logout, isAuthenticated } = useAuth();
+
   return (
     <header className="bg-primary text-primary-foreground shadow-md fixed top-0 left-0 right-0 z-50 py-3 md:py-2">
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
         <div className="text-2xl font-bold mb-2 md:mb-0">桃園獵鷹宇宙</div>
-        <nav>
-          <ul className="flex flex-wrap justify-center md:justify-start items-center space-x-1 md:space-x-2">
-            {navItems.map((item) => (
-              <li key={item.id}>
-                <Button
-                  variant="ghost"
-                  onClick={() => onTabChange(item.id)}
-                  className={cn(
-                    "text-primary-foreground hover:bg-primary/80 hover:text-accent-foreground px-2 py-1 md:px-3 md:py-1.5",
-                    activeTab === item.id ? "border-b-2 border-warning text-warning" : ""
-                  )}
-                >
-                  {item.label}
-                </Button>
-              </li>
-            ))}
-            <li className="flex gap-1 md:gap-2 mt-2 md:mt-0 md:ml-4">
-              {currentUserRole === 'guest' ? (
-                <>
+        {isAuthenticated && (
+          <nav>
+            <ul className="flex flex-wrap justify-center md:justify-start items-center space-x-1 md:space-x-2">
+              {navItems.map((item) => (
+                <li key={item.id}>
                   <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onLoginAsPlayer}
-                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground font-semibold"
+                    variant="ghost"
+                    onClick={() => onTabChange(item.id)}
+                    className={cn(
+                      "text-primary-foreground hover:bg-primary/80 hover:text-accent-foreground px-2 py-1 md:px-3 md:py-1.5",
+                      activeTab === item.id ? "border-b-2 border-accent text-accent" : "" // Use accent for active tab indicator
+                    )}
                   >
-                    球員登入
+                    {item.label}
                   </Button>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={onLoginAsCoach}
-                    className="border-secondary text-secondary hover:bg-secondary/80 hover:text-primary-foreground font-semibold"
-                  >
-                    教練登入
-                  </Button>
-                </>
-              ) : (
+                </li>
+              ))}
+              <li className="flex gap-1 md:gap-2 mt-2 md:mt-0 md:ml-4 items-center">
+                <span className="text-sm hidden md:inline">
+                  角色: {currentUserRole} | 使用者: {username}
+                </span>
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={onLogout}
-                  className="border-accent text-accent hover:bg-accent/80 hover:text-primary-foreground font-semibold"
+                  onClick={logout}
+                  className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-semibold"
                 >
-                  登出 ({currentUserRole})
+                  <LogOut className="mr-1.5 h-4 w-4" />
+                  登出
                 </Button>
-              )}
-            </li>
-          </ul>
-        </nav>
+              </li>
+            </ul>
+          </nav>
+        )}
       </div>
     </header>
   );

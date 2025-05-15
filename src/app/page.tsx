@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -14,12 +15,16 @@ import { initialDb } from '@/lib/data';
 import type { UserRole, SectionName, AppData, AgeGroup, Match, League, Player, MatchConflictInfo, MatchConflicts } from '@/lib/types';
 import { USER_ROLES, levelOptions } from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger as ShadcnTabsTrigger } from "@/components/ui/tabs";
-
+import { useAuth } from '@/contexts/auth-context';
+import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 
 export default function HomePage() {
+  const { isAuthenticated, currentUserRole, loading: authLoading } = useAuth();
+  const router = useRouter();
+  
   const [appData, setAppData] = useState<AppData>(initialDb);
   const [activeTab, setActiveTab] = useState<SectionName>('matches');
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole>(USER_ROLES.GUEST);
   
   const [selectedGroup, setSelectedGroup] = useState<AgeGroup | "all">("all");
   const [selectedLevelU, setSelectedLevelU] = useState<string>("all");
@@ -31,34 +36,23 @@ export default function HomePage() {
   const { toast } = useToast();
 
   useEffect(() => {
+    if (!authLoading && !isAuthenticated) {
+      router.push('/login');
+    }
+  }, [isAuthenticated, authLoading, router]);
+
+  useEffect(() => {
     if (selectedGroup !== "all") {
       setAvailableLevelUOptions(levelOptions[selectedGroup as Exclude<AgeGroup, "all">] || []);
-      // If the current selectedLevelU is not in the new options, reset it to "all"
       if (!levelOptions[selectedGroup as Exclude<AgeGroup, "all">]?.includes(selectedLevelU)) {
         setSelectedLevelU("all");
       }
     } else {
-      setAvailableLevelUOptions([]); // No specific levels if "all groups" is selected
+      setAvailableLevelUOptions([]); 
       setSelectedLevelU("all");
     }
   }, [selectedGroup, selectedLevelU]);
-
-
-  const handleLoginAsPlayer = () => {
-    setCurrentUserRole(USER_ROLES.PLAYER);
-    toast({ title: "登入成功", description: "已模擬球員登入。部分功能將受限。" });
-  };
-
-  const handleLoginAsCoach = () => {
-    setCurrentUserRole(USER_ROLES.COACH);
-    toast({ title: "登入成功", description: "已模擬教練登入。擁有完整權限。" });
-  };
-
-  const handleLogout = () => {
-    setCurrentUserRole(USER_ROLES.GUEST);
-    toast({ title: "已登出" });
-  };
-
+  
   const handleOpenConfirmDialog = (title: string, description: string, onConfirm: () => void) => {
     setConfirmDialogProps({ title, description, onConfirm });
     setIsConfirmDialogOpen(true);
@@ -115,9 +109,7 @@ export default function HomePage() {
           p.levelU === selectedLevelU || p.participatingLeagueIds.some(plId => levelFilteredLeagueIds.includes(plId))
         );
       }
-    } else if (selectedLevelU !== 'all') { // Only levelU is selected, group is 'all'
-         // This case might need refinement: if only levelU is selected, how to filter across all groups?
-         // For now, assume if group is 'all', levelU implies filtering leagues with that levelU regardless of group.
+    } else if (selectedLevelU !== 'all') { 
          filteredLeagues = appData.leagues.filter(l => l.levelU === selectedLevelU);
          const levelFilteredLeagueIds = filteredLeagues.map(l => l.id);
          filteredMatches = appData.matches.filter(m => 
@@ -175,15 +167,24 @@ export default function HomePage() {
     return conflicts;
   }, [filteredData.matches]);
 
+  if (authLoading || !isAuthenticated) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">載入中或重定向...</p>
+      </div>
+    );
+  }
+  
+  // Ensure currentUserRole is not null before passing to child components
+  const validCurrentUserRole = currentUserRole || USER_ROLES.GUEST;
+
   return (
     <div className="flex flex-col min-h-screen bg-background">
       <Header
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        currentUserRole={currentUserRole}
-        onLoginAsPlayer={handleLoginAsPlayer}
-        onLoginAsCoach={handleLoginAsCoach}
-        onLogout={handleLogout}
+        // currentUserRole is now handled by AuthContext, Header will consume it
       />
       <main className="flex-grow container mx-auto px-4 pt-[120px] md:pt-[80px] pb-8">
         <GlobalFiltersCard
@@ -195,12 +196,11 @@ export default function HomePage() {
         />
         
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SectionName)} className="w-full">
-          {/* ShadcnTabsTriggers are rendered by Header. This Tabs component is for content. */}
           <TabsContent value="matches">
             <MatchesSection 
               appData={appData} 
               setAppData={setAppData} 
-              currentUserRole={currentUserRole} 
+              currentUserRole={validCurrentUserRole} 
               onOpenConfirmDialog={handleOpenConfirmDialog}
               filteredMatches={filteredData.matches}
               filteredLeagues={filteredData.leagues}
@@ -212,7 +212,7 @@ export default function HomePage() {
             <LeaguesSection 
               appData={appData} 
               setAppData={setAppData} 
-              currentUserRole={currentUserRole} 
+              currentUserRole={validCurrentUserRole} 
               onOpenConfirmDialog={handleOpenConfirmDialog}
               filteredLeagues={filteredData.leagues}
               globalGroupIndicator={globalGroupIndicatorText}
@@ -222,7 +222,7 @@ export default function HomePage() {
             <PlayersSection 
               appData={appData} 
               setAppData={setAppData} 
-              currentUserRole={currentUserRole} 
+              currentUserRole={validCurrentUserRole} 
               onOpenConfirmDialog={handleOpenConfirmDialog}
               filteredPlayers={filteredData.players}
               globalGroupIndicator={globalGroupIndicatorText}
@@ -233,7 +233,7 @@ export default function HomePage() {
               appData={appData}
               filteredPlayers={filteredData.players}
               filteredMatches={filteredData.matches}
-              filteredLeagues={filteredData.leagues} // Pass globally filtered leagues for dropdown
+              filteredLeagues={filteredData.leagues}
               globalGroupIndicator={globalGroupIndicatorText}
             />
           </TabsContent>
