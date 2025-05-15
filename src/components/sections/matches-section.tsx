@@ -1,5 +1,6 @@
 
 "use client";
+
 import React, { useState, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -141,8 +142,7 @@ export function MatchesSection({
     });
   };
   
-  const isCoachOrAdmin = currentUserRole === USER_ROLES.COACH; // Simplified for now
-  // Player role specific UI will be handled differently
+  const isCoachOrAdmin = currentUserRole === USER_ROLES.COACH; 
 
   const displayedMatches = useMemo(() => {
     return filteredMatches.filter(match => {
@@ -267,7 +267,7 @@ export function MatchesSection({
                       className={cn({
                         'bg-[var(--conflict-error-bg)]': conflict.type === 'overlap',
                         'bg-[var(--conflict-warning-bg)]': conflict.type === 'sameday',
-                        'hidden-for-player-role': currentUserRole === USER_ROLES.PLAYER && !isCoachOrAdmin && isActionDisabled, // Hide actions for player
+                        // Removed: 'hidden-for-player-role': currentUserRole === USER_ROLES.PLAYER && !isCoachOrAdmin && isActionDisabled, 
                       })}
                     >
                       <TableCell className="p-1 text-center">
@@ -380,3 +380,5 @@ export function MatchesSection({
     </div>
   );
 }
+    
+    
