@@ -4,26 +4,26 @@
 
 @layer base {
   :root {
-    /* Light Theme (Blue-centric, fallback if .dark is not applied) */
-    --background: 220 30% 97%; /* Very Light Blue-Gray */
-    --foreground: 220 40% 15%; /* Dark Slate Blue */
+    /* Light Theme (Deep Blue focus, adjusted for light background) */
+    --background: 220 60% 96%; /* Very Light Blue-ish Gray */
+    --foreground: 220 40% 10%; /* Dark Blue/Black Text */
 
-    --card: 220 30% 100%; /* White with a hint of blue */
-    --card-foreground: 220 40% 15%; /* Dark Slate Blue */
+    --card: 0 0% 100%; /* White */
+    --card-foreground: 220 40% 10%; /* Dark Blue/Black Text */
 
-    --popover: 220 30% 100%; /* White with a hint of blue */
-    --popover-foreground: 220 40% 15%; /* Dark Slate Blue */
+    --popover: 0 0% 100%; /* White */
+    --popover-foreground: 220 40% 10%; /* Dark Blue/Black Text */
 
-    --primary: 217 91% 50%; /* Strong Blue */
+    --primary: 220 75% 50%; /* Strong, Deep Blue */
     --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 217 70% 70%; /* Lighter Blue */
-    --secondary-foreground: 220 40% 10%; /* Darkest Blue for contrast */
+    --secondary: 220 60% 70%; /* Softer, Lighter Blue */
+    --secondary-foreground: 220 40% 10%; /* Dark Blue/Black Text for contrast */
 
-    --muted: 220 30% 90%; /* Light Blue-Gray */
+    --muted: 220 50% 90%; /* Light Muted Blue-Gray */
     --muted-foreground: 220 30% 45%; /* Medium Blue-Gray */
 
-    --accent: 45 100% 50%; /* Bright Yellow/Gold */
+    --accent: 48 95% 50%; /* Gold */
     --accent-foreground: 240 10% 10%; /* Dark Blue/Black for text on accent */
     
     --destructive: 0 72% 51%; /* Red */
@@ -35,9 +35,9 @@
     --warning: 38 92% 50%; /* Orange */
     --warning-foreground: 240 10% 10%; /* Dark Blue/Black */
 
-    --border: 220 30% 85%; /* Medium-Light Blue-Gray Border */
-    --input: 220 30% 75%; /* Slightly darker for input borders */
-    --ring: 217 91% 65%; /* Brighter Blue for focus rings */
+    --border: 220 40% 88%; /* Medium-Light Blue-Gray Border */
+    --input: 220 40% 92%; /* Lighter for input borders on light bg */
+    --ring: 220 75% 55%; /* Brighter Blue for focus rings, related to primary */
 
     --radius: 0.5rem;
 
@@ -47,45 +47,45 @@
     --disabled-bg: #e9ecef;
     --disabled-text: #6c757d;
 
-    --chart-1: 217 91% 50%; /* Primary Blue */
+    --chart-1: 220 75% 50%; /* Primary Blue */
     --chart-2: 190 70% 50%; /* Cyan/Teal */
     --chart-3: 280 60% 60%; /* Purple */
-    --chart-4: 45 100% 50%; /* Accent Yellow/Gold */
+    --chart-4: 48 95% 50%; /* Accent Gold */
     --chart-5: 0 60% 60%;   /* Reddish */
 
-    /* Sidebar Colors for Light Theme (Blue-centric) */
-    --sidebar-background: 220 40% 20%; /* Dark Slate Blue */
+    /* Sidebar Colors for Light Theme */
+    --sidebar-background: 220 30% 25%; /* Darker Blue for contrast sidebar */
     --sidebar-foreground: 220 30% 95%; /* Very Light Blue for text */
     --sidebar-primary: 0 0% 100%; /* White for active item background */
-    --sidebar-primary-foreground: 220 40% 20%; /* Dark Slate Blue for active item text */
-    --sidebar-accent: 217 91% 50%; /* Primary Blue for hover */
+    --sidebar-primary-foreground: 220 30% 25%; /* Dark Blue for active item text */
+    --sidebar-accent: 220 75% 50%; /* Primary Blue for hover (matches main primary) */
     --sidebar-accent-foreground: 0 0% 100%; /* White for hover text */
-    --sidebar-border: 220 40% 15%; /* Darker Slate Blue for border */
-    --sidebar-ring: 45 100% 50%; /* Accent Yellow/Gold for ring */
+    --sidebar-border: 220 30% 20%; /* Darker Blue for border */
+    --sidebar-ring: 48 95% 50%; /* Accent Gold for ring */
   }
 
   .dark {
-    /* Dark Theme (Deep Blue focus) */
-    --background: 220 40% 8%; /* Very Dark Navy */
-    --foreground: 210 40% 90%; /* Light Grayish Blue */
+    /* Dark Theme (Even Deeper Blue focus) */
+    --background: 220 45% 7%; /* Darker and slightly more saturated Navy */
+    --foreground: 210 30% 92%; /* Light Grayish Blue for text */
 
-    --card: 220 40% 12%; /* Dark Navy, slightly lighter */
-    --card-foreground: 210 40% 90%; /* Light Grayish Blue */
+    --card: 220 40% 10%; /* Darker Navy Card */
+    --card-foreground: 210 30% 90%; /* Light Grayish Blue */
 
-    --popover: 220 40% 10%; /* Even Darker Navy for Popovers */
-    --popover-foreground: 210 40% 90%; /* Light Grayish Blue */
+    --popover: 220 40% 8%; /* Darker Navy Popover */
+    --popover-foreground: 210 30% 90%; /* Light Grayish Blue */
 
-    --primary: 217 91% 65%; /* Brighter Blue for dark mode */
-    --primary-foreground: 220 40% 5%; /* Near Black for contrast */
+    --primary: 220 80% 60%; /* Deep, Saturated Blue */
+    --primary-foreground: 220 20% 98%; /* Very Light/White for contrast on primary */
 
-    --secondary: 217 50% 45%; /* Muted Medium Blue */
-    --secondary-foreground: 210 40% 95%; /* Very Light Blue/White */
+    --secondary: 220 50% 50%; /* Muted, Deeper Blue */
+    --secondary-foreground: 210 30% 95%; /* Very Light Blue/White */
 
-    --muted: 220 40% 20%; /* Dark Slate Blue */
-    --muted-foreground: 210 30% 60%; /* Medium Grayish Blue */
+    --muted: 220 35% 18%; /* Dark Slate Blue */
+    --muted-foreground: 210 30% 65%; /* Medium Grayish Blue */
 
-    --accent: 50 100% 60%; /* Bright Gold/Yellow */
-    --accent-foreground: 220 40% 5%; /* Near Black for text on accent */
+    --accent: 48 100% 55%; /* Bright Gold */
+    --accent-foreground: 220 50% 10%; /* Near Black for text on accent */
 
     --destructive: 0 63% 50%; /* Vivid Red */
     --destructive-foreground: 0 0% 98%; /* Light text on destructive */
@@ -96,9 +96,9 @@
     --warning: 40 100% 55%; /* Brighter Orange */
     --warning-foreground: 0 0% 5%; /* Dark text on warning */
 
-    --border: 220 40% 25%; /* Darker Muted Blue Border */
-    --input: 220 40% 30%; /* Slightly lighter for input borders on dark bg */
-    --ring: 217 91% 70%; /* Brightest Blue for focus rings */
+    --border: 220 35% 22%; /* Darker Muted Blue Border */
+    --input: 220 35% 28%; /* Slightly lighter for input borders on dark bg */
+    --ring: 220 80% 65%; /* Brightest Blue for focus rings, related to primary */
 
     --conflict-warning-bg: 45 100% 20%; /* Dark yellow/brown for warning background */
     --conflict-error-bg: 0 70% 25%;   /* Dark red for error background */
@@ -106,14 +106,14 @@
     --disabled-text: 210 30% 50%;
 
     /* Sidebar Colors for Dark Theme */
-    --sidebar-background: 220 40% 10%; /* Dark Navy for sidebar */
-    --sidebar-foreground: 210 40% 85%; /* Light Grayish Blue for text */
-    --sidebar-primary: 217 91% 65%;    /* Primary Blue for active item background */
-    --sidebar-primary-foreground: 0 0% 100%; /* White for active item text */
-    --sidebar-accent: 217 70% 50%; /* Medium Blue for hover */
+    --sidebar-background: 220 40% 8%; /* Dark Navy for sidebar (matches popover) */
+    --sidebar-foreground: 210 30% 88%; /* Light Grayish Blue for text */
+    --sidebar-primary: 220 80% 60%;    /* Primary Blue for active item background (matches main primary) */
+    --sidebar-primary-foreground: 220 20% 98%; /* White for active item text (matches main primary-foreground) */
+    --sidebar-accent: 220 60% 50%; /* Medium Blue for hover */
     --sidebar-accent-foreground: 0 0% 95%; /* Light text for hover */
-    --sidebar-border: 220 40% 5%;  /* Very Dark Navy for border */
-    --sidebar-ring: 50 100% 60%; /* Accent Gold for ring */
+    --sidebar-border: 220 40% 6%;  /* Very Dark Navy for border */
+    --sidebar-ring: 48 100% 55%; /* Accent Gold for ring */
   }
 }
 
