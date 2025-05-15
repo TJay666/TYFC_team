@@ -51,10 +51,9 @@ export function Header({
                   角色: {currentUserRole} | 使用者: {username}
                 </span>
                 <Button
-                  variant="outline"
                   size="sm"
                   onClick={logout}
-                  className="border-accent text-accent hover:bg-accent hover:text-accent-foreground font-semibold"
+                  className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
                 >
                   <LogOut className="mr-1.5 h-4 w-4" />
                   登出
