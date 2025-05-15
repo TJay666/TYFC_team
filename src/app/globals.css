@@ -4,116 +4,115 @@
 
 @layer base {
   :root {
-    /* Light Theme (Inspired by Deep Blue, with Gold Accent) */
-    --background: 210 60% 97%; /* Very Light Cool Gray/Blue */
-    --foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
+    /* Light Theme - TeamTactics Style */
+    --background: 220 20% 97%;    /* Light Gray: F5F5F5 */
+    --foreground: 220 10% 25%;     /* Dark Gray for text */
 
-    --card: 0 0% 100%; /* White */
-    --card-foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
+    --card: 0 0% 100%;            /* White for cards */
+    --card-foreground: 220 10% 25%; /* Dark Gray for card text */
 
-    --popover: 0 0% 100%; /* White */
-    --popover-foreground: 215 40% 15%; /* Dark Desaturated Blue Text */
+    --popover: 0 0% 100%;          /* White for popovers */
+    --popover-foreground: 220 10% 25%; /* Dark Gray for popover text */
 
-    --primary: 215 70% 48%; /* Strong, Saturated Blue */
-    --primary-foreground: 0 0% 100%; /* White */
+    --primary: 120 60% 34%;       /* Forest Green: 228B22 */
+    --primary-foreground: 0 0% 100%; /* White for text on primary */
 
-    --secondary: 210 65% 70%; /* Softer, Lighter Blue */
-    --secondary-foreground: 215 40% 15%; /* Dark Blue/Black Text for contrast */
+    --secondary: 120 40% 50%;     /* Lighter Green */
+    --secondary-foreground: 0 0% 100%; /* White for text on secondary */
 
-    --muted: 210 50% 92%; /* Light Muted Blue-Gray */
-    --muted-foreground: 215 30% 50%; /* Medium Blue-Gray */
+    --muted: 220 20% 90%;         /* Lighter Gray for muted elements */
+    --muted-foreground: 220 10% 50%;  /* Medium Gray for muted text */
 
-    --accent: 45 90% 50%; /* Gold/Yellow */
-    --accent-foreground: 240 10% 10%; /* Dark for text on accent */
+    --accent: 51 100% 50%;        /* Gold: FFD700 */
+    --accent-foreground: 220 10% 20%; /* Dark text for contrast on gold */
     
-    --destructive: 0 72% 51%; /* Red */
+    --destructive: 0 70% 50%;      /* Standard Red */
     --destructive-foreground: 0 0% 100%; /* White */
 
-    --success: 140 60% 40%; /* Green */
+    --success: 140 60% 40%;      /* Standard Green */
     --success-foreground: 0 0% 100%; /* White */
     
-    --warning: 38 92% 50%; /* Orange */
-    --warning-foreground: 240 10% 10%; /* Dark */
+    --warning: 38 92% 50%;       /* Standard Orange/Yellow for warnings */
+    --warning-foreground: 0 0% 0%; /* Black text for contrast */
 
-    --border: 210 40% 88%; /* Medium-Light Blue-Gray Border */
-    --input: 210 40% 93%; /* Lighter for input borders on light bg */
-    --ring: 215 70% 55%; /* Brighter Blue for focus rings, related to primary */
+    --border: 220 15% 85%;       /* Medium-Light Gray for borders */
+    --input: 220 15% 80%;        /* Slightly darker gray for input borders */
+    --ring: 120 60% 45%;          /* Brighter Forest Green for focus rings */
 
     --radius: 0.5rem;
 
-    /* Custom variables, can be themed if needed */
-    --conflict-warning-bg: #fff3e0; /* Light orange - kept for now, can be themed */
-    --conflict-error-bg: #ffebee;   /* Light red - kept for now, can be themed */
+    /* Custom variables from your app, kept as hex */
+    --conflict-warning-bg: #fff3e0; 
+    --conflict-error-bg: #ffebee;   
     --disabled-bg: #e9ecef;
     --disabled-text: #6c757d;
 
-    --chart-1: 215 70% 50%; /* Primary Blue */
-    --chart-2: 190 65% 50%; /* Cyan/Teal */
-    --chart-3: 270 55% 60%; /* Purple (complementary) */
-    --chart-4: 45 90% 50%; /* Accent Gold */
-    --chart-5: 0 55% 60%;   /* Reddish (complementary) */
-
-    /* Sidebar Colors for Light Theme */
-    --sidebar-background: 215 35% 28%; /* Darker Blue for contrast sidebar */
-    --sidebar-foreground: 210 30% 95%; /* Very Light Blue/White for text */
-    --sidebar-primary: 0 0% 100%; /* White for active item background */
-    --sidebar-primary-foreground: 215 35% 28%; /* Dark Blue for active item text */
-    --sidebar-accent: 215 70% 48%; /* Primary Blue for hover (matches main primary) */
-    --sidebar-accent-foreground: 0 0% 100%; /* White for hover text */
-    --sidebar-border: 215 35% 22%; /* Darker Blue for border */
-    --sidebar-ring: 45 90% 50%; /* Accent Gold for ring */
+    /* Chart colors based on app's palette */
+    --chart-1: 120 60% 34%;      /* Primary - Forest Green */
+    --chart-2: 120 40% 50%;      /* Secondary - Lighter Green */
+    --chart-3: 51 100% 50%;       /* Accent - Gold */
+    --chart-4: 140 60% 40%;       /* Success - Green */
+    --chart-5: 0 70% 50%;         /* Destructive - Red */
   }
 
   .dark {
-    /* Dark Theme (Based on Deep Blue Image Color ~HSL(213, 50%, 25%)) */
-    --background: 213 48% 12%; /* Very Dark Deep Blue */
-    --foreground: 210 35% 88%; /* Light Grayish Blue for text */
+    /* Dark Theme - Deep Gray Background */
+    --background: 210 6% 15%;    /* Deep Gray */
+    --foreground: 210 20% 90%;    /* Light Gray for text */
 
-    --card: 213 45% 18%; /* Darker Deep Blue Card */
-    --card-foreground: 210 35% 85%; /* Light Grayish Blue */
+    --card: 210 6% 20%;          /* Slightly Lighter Deep Gray for cards */
+    --card-foreground: 210 20% 90%; /* Light Gray for card text */
 
-    --popover: 213 45% 15%; /* Darkest Deep Blue Popover */
-    --popover-foreground: 210 35% 85%; /* Light Grayish Blue */
+    --popover: 210 6% 18%;        /* Deep Gray for popovers */
+    --popover-foreground: 210 20% 90%;/* Light Gray for popover text */
 
-    --primary: 213 65% 55%; /* Brighter, Saturated Deep Blue (for actions) */
-    --primary-foreground: 210 25% 98%; /* Very Light/White for contrast on primary */
+    --primary: 120 55% 45%;       /* Forest Green (adjusted for dark theme) */
+    --primary-foreground: 0 0% 100%; /* White */
 
-    --secondary: 213 55% 40%; /* Muted, Deep Blue (closer to image color) */
-    --secondary-foreground: 210 35% 92%; /* Very Light Blue/White */
+    --secondary: 120 40% 35%;     /* Darker Lighter Green */
+    --secondary-foreground: 0 0% 100%; /* White */
 
-    --muted: 213 40% 25%; /* Dark Slate Blue (image color as muted bg) */
-    --muted-foreground: 210 35% 70%; /* Medium Grayish Blue */
+    --muted: 210 6% 28%;          /* Medium Deep Gray for muted elements */
+    --muted-foreground: 210 15% 65%;  /* Lighter Gray for muted text */
 
-    --accent: 45 95% 55%; /* Bright Gold/Yellow */
-    --accent-foreground: 220 40% 10%; /* Near Black for text on accent */
-
-    --destructive: 0 65% 55%; /* Vivid Red */
-    --destructive-foreground: 0 0% 98%; /* Light text on destructive */
-
-    --success: 140 65% 45%; /* Brighter Green */
-    --success-foreground: 0 0% 5%; /* Dark text on success */
+    --accent: 51 100% 60%;        /* Gold (slightly brighter for dark theme) */
+    --accent-foreground: 210 25% 15%; /* Darker text for contrast on gold */
     
-    --warning: 40 95% 55%; /* Brighter Orange */
-    --warning-foreground: 0 0% 5%; /* Dark text on warning */
+    --destructive: 0 60% 55%;      /* Standard Red (adjusted) */
+    --destructive-foreground: 0 0% 100%; /* White */
 
-    --border: 213 40% 30%; /* Darker Muted Blue Border */
-    --input: 213 40% 22%; /* Slightly lighter for input borders on dark bg */
-    --ring: 213 65% 60%; /* Brightest Blue for focus rings, related to primary */
+    --success: 140 55% 45%;      /* Standard Green (adjusted) */
+    --success-foreground: 0 0% 100%; /* White */
+    
+    --warning: 38 90% 55%;       /* Standard Orange/Yellow (adjusted) */
+    --warning-foreground: 210 25% 10%; /* Dark text for contrast */
 
-    --conflict-warning-bg: 45 100% 20%; /* Dark yellow/brown for warning background */
-    --conflict-error-bg: 0 70% 25%;   /* Dark red for error background */
-    --disabled-bg: 213 35% 22%;
-    --disabled-text: 210 30% 55%;
+    --border: 210 6% 30%;         /* Dark Gray for borders */
+    --input: 210 6% 25%;          /* Dark Gray for input borders */
+    --ring: 120 55% 55%;          /* Brighter Forest Green for focus rings */
 
-    /* Sidebar Colors for Dark Theme */
-    --sidebar-background: 213 45% 15%; /* Dark Deep Blue for sidebar (matches popover) */
-    --sidebar-foreground: 210 35% 88%; /* Light Grayish Blue for text */
-    --sidebar-primary: 213 65% 55%;    /* Primary Blue for active item background (matches main primary) */
-    --sidebar-primary-foreground: 210 25% 98%; /* White for active item text (matches main primary-foreground) */
-    --sidebar-accent: 213 60% 45%; /* Medium Deep Blue for hover */
-    --sidebar-accent-foreground: 0 0% 95%; /* Light text for hover */
-    --sidebar-border: 213 45% 10%;  /* Very Dark Deep Blue for border */
-    --sidebar-ring: 45 95% 55%; /* Accent Gold for ring */
+    /* Custom variables from your app, kept as hex for now or convert if needed */
+    --conflict-warning-bg: hsl(45 100% 20%); /* Dark Gold */
+    --conflict-error-bg: hsl(0 70% 25%);   /* Dark Red */
+    --disabled-bg: hsl(210 6% 22%);
+    --disabled-text: hsl(210 15% 55%);
+
+    /* Chart colors for dark theme */
+    --chart-1: 120 55% 45%;      /* Primary */
+    --chart-2: 120 40% 35%;      /* Secondary */
+    --chart-3: 51 100% 60%;       /* Accent */
+    --chart-4: 140 55% 45%;       /* Success */
+    --chart-5: 0 60% 55%;         /* Destructive */
+
+    /* Sidebar Colors for Dark Theme (if using sidebar component) */
+    --sidebar-background: 210 6% 12%; /* Even Deeper Gray for Sidebar */
+    --sidebar-foreground: 210 20% 88%; 
+    --sidebar-primary: 120 55% 50%;    
+    --sidebar-primary-foreground: 0 0% 100%; 
+    --sidebar-accent: 51 100% 55%; 
+    --sidebar-accent-foreground: 210 25% 10%; 
+    --sidebar-border: 210 6% 20%;   
+    --sidebar-ring: 51 100% 60%; 
   }
 }
 
@@ -124,27 +123,35 @@
   body {
     @apply bg-background text-foreground;
   }
-  html.dark body { /* Ensure dark theme applies if html has .dark */
-    @apply bg-background text-foreground; /* Uses .dark variables */
+  html.dark body { 
+    @apply bg-background text-foreground; 
   }
   .conflict-error {
-    @apply bg-[var(--conflict-error-bg)];
+    background-color: var(--conflict-error-bg); 
   }
+  .conflict-warning {
+    background-color: var(--conflict-warning-bg);
+  }
+
   .conflict-warning td:first-child::before {
     content: "❗ ";
-    @apply text-yellow-500 font-bold; /* Consider theming this if direct color is an issue */
+    color: hsl(var(--warning)); 
+    font-weight: bold;
   }
   .dark .conflict-warning td:first-child::before {
     content: "❗ ";
-    @apply text-[hsl(var(--warning))] font-bold;
+    color: hsl(var(--warning)); 
+    font-weight: bold;
   }
   .conflict-error td:first-child::before {
     content: "❌ ";
-    @apply text-red-600 font-bold; /* Consider theming this */
+    color: hsl(var(--destructive)); 
+    font-weight: bold;
   }
   .dark .conflict-error td:first-child::before {
     content: "❌ ";
-    @apply text-[hsl(var(--destructive))] font-bold;
+    color: hsl(var(--destructive)); 
+    font-weight: bold;
   }
 }
 
