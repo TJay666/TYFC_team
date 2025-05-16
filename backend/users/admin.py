@@ -16,11 +16,5 @@ class CustomUserAdmin(UserAdmin):
     # Add the 'role' field to the list filters
     list_filter = ('is_staff', 'role')
 
-# Unregister the default User model if it was registered
-try:
-    admin.site.unregister(User)
-except admin.site.NotRegistered:
-    pass
-
 # Register the CustomUser with the custom admin class
 admin.site.register(User, CustomUserAdmin)

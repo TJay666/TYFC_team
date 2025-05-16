@@ -9,6 +9,7 @@
     pkgs.zulu
     pkgs.python3
     pkgs.python3Packages.django
+    pkgs.python312Packages.pip
   ];
   # Sets environment variables in the workspace
   env = {};

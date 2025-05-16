@@ -8,7 +8,7 @@ Function views
     1. Add an import:  from my_app import views
     2. Add a URL to urlpatterns:  path('', views.home, name='home')
 Class-based views
-    1. Add an import:  from other_app.views import Home
+    1. Add an import:  from other_app import Home
     2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
 Including another URLconf
     1. Import the include() function: from django.urls import include, path
@@ -19,5 +19,10 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('users.urls')), # Include user management URLs
+    path('api/users/', include('users.urls')), # Include user management URLs
+    path('api/teams/', include('teams.urls')), # Include teams management URLs
+    path('api/players/', include('players.urls')), # Include players management URLs
+    path('api/leagues/', include('leagues.urls')), # Include leagues management URLs
+    path('api/matches/', include('matches.urls')), # Include matches management URLs
+    path('api/match-statistics/', include('match_statistics.urls')), # Include match statistics URLs
 ]
