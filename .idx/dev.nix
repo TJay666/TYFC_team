@@ -10,6 +10,7 @@
     pkgs.python3
     pkgs.python3Packages.django
     pkgs.python312Packages.pip
+    pkgs.brlcad
   ];
   # Sets environment variables in the workspace
   env = {};
