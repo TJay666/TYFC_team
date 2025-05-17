@@ -10,37 +10,52 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { USER_ROLES } from '@/lib/types';
+// import { USER_ROLES } from '@/lib/types'; // No longer needed for direct login logic
+import { loginUser } from '@/lib/auth-api'; // Import the login API function
 
 export default function LoginPage() {
-  const { login, isAuthenticated, loading: authLoading, currentUserRole } = useAuth();
+  const { login, isAuthenticated, loading: authLoading } = useAuth();
   const router = useRouter();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
+  // Redirect authenticated users to the homepage
   useEffect(() => {
     if (!authLoading && isAuthenticated) {
-      router.push('/'); 
+      router.push('/');
     }
   }, [isAuthenticated, authLoading, router]);
 
-  const handlePlayerLogin = () => {
-    // For demo, using player1's ID from initialDb. In real app, this ID comes from auth backend.
-    login(USER_ROLES.PLAYER, username || '球員A', 'player1'); 
-  };
+  const handleLogin = async (event: React.FormEvent) => {
+     event.preventDefault(); // Prevent default form submission
+     setIsLoading(true);
+     setError(null);
 
-  const handleCoachLogin = () => {
-    // For demo, using a generic coach ID.
-    login(USER_ROLES.COACH, username || '教練B', 'coach1'); 
-  };
+     try {
+       // Call the backend login API
+       const tokens = await loginUser(username, password);
+       // Pass tokens to the auth context login function
+       await login(tokens.access, tokens.refresh);
+       // auth context will handle setting state and potentially redirecting
+     } catch (err: any) {
+       // Handle login errors (e.g., invalid credentials)
+       setError(err.message || '登入失敗，請檢查使用者名稱和密碼。');
+       console.error('Login error:', err);
+     } finally {
+       setIsLoading(false);
+     }
+   };
 
-  if (authLoading || isAuthenticated) {
-    return (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-            <p className="text-gray-400">載入中或重定向...</p>
-        </div>
-    );
-  }
+   // Render loading/redirect state if auth is loading or user is already authenticated
+   if (authLoading || isAuthenticated) {
+     return (
+         <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
+             <p className="text-gray-400">載入中或重定向...</p>
+         </div>
+     );
+   }
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
@@ -58,48 +73,51 @@ export default function LoginPage() {
             />
           </div>
           <CardTitle className="text-3xl font-bold text-white">獵鷹登入</CardTitle>
-          <CardDescription className="text-gray-300">歡迎回來！請選擇您的登入身份。</CardDescription>
+          <CardDescription className="text-gray-300">歡迎回來！請輸入您的帳號密碼。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="username" className="text-card-foreground">使用者名稱 (選填)</Label>
-            <Input 
-              id="username" 
-              placeholder="請輸入您的帳號" 
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-card-foreground">密碼 (選填)</Label>
-            <Input 
-              id="password" 
-              type="password" 
-              placeholder="請輸入您的密碼" 
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Button onClick={handlePlayerLogin} className="w-full bg-secondary text-secondary-foreground hover:bg-secondary/90 py-3 text-base">
-              球員登入
+          {/* Login Form */}
+          <form onSubmit={handleLogin} className="space-y-4"> {/* Use handleLogin for form submission */}
+            <div className="space-y-2">
+              <Label htmlFor="username" className="text-card-foreground">使用者名稱</Label>
+              <Input 
+                id="username" 
+                placeholder="請輸入您的帳號" 
+                required
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="password" className="text-card-foreground">密碼</Label>
+              <Input 
+                id="password" 
+                type="password" 
+                placeholder="請輸入您的密碼" 
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+              />
+            </div>
+
+            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            
+            {/* Single Login Button */}
+            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 text-base" disabled={isLoading}>
+               {isLoading ? '登入中...' : '登入'}
             </Button>
-            <Button onClick={handleCoachLogin} className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 text-base">
-              教練登入
-            </Button>
-          </div>
+          </form>
+
         </CardContent>
         <CardFooter className="flex flex-col items-center space-y-2">
-          <Link href="/register" legacyBehavior>
-            <a className="text-sm text-primary hover:text-primary/80 hover:underline">
+           <Link href="/register" legacyBehavior>
+             <a className="text-sm text-primary hover:text-primary/80 hover:underline">
               還沒有帳號嗎？點此註冊
             </a>
           </Link>
-           <p className="text-xs text-muted-foreground text-center px-4">
-            注意：此為模擬登入系統。輸入的帳號密碼僅供演示，不會進行真實驗證。
-          </p>
+           {/* Removed the demo login text */}
         </CardFooter>
       </Card>
        <footer className="mt-8 text-center text-sm text-gray-300">
@@ -108,4 +126,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
