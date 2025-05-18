@@ -1,6 +1,6 @@
 // src/lib/auth-api.ts
 
-const API_BASE_URL = 'http://localhost:8000'; // Your Django backend URL
+const API_BASE_URL = 'https://8000-firebase-studio-1747234445739.cluster-73qgvk7hjjadkrjeyexca5ivva.cloudworkstations.dev'; // Your Django backend URL
 
 // Defines the structure for the response from the token obtain API
 interface TokenObtainPairResponse {
@@ -43,7 +43,7 @@ export const registerUser = async (data: RegisterData): Promise<RegisterResponse
 };
 
 // Calls the backend token obtain API (login)
-export const loginUser = async (username: string, password সরবরাহ string): Promise<TokenObtainPairResponse> => {
+export const loginUser = async (username: string, password: string): Promise<TokenObtainPairResponse> => {
   const response = await fetch(`${API_BASE_URL}/api/token/`, {
     method: 'POST',
     headers: {
