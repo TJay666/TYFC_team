@@ -10,8 +10,6 @@ import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-// import { USER_ROLES } from '@/lib/types'; // No longer needed for direct login logic
-import { loginUser } from '@/lib/auth-api'; // Import the login API function
 
 export default function LoginPage() {
   const { login, isAuthenticated, loading: authLoading } = useAuth();
@@ -27,21 +25,20 @@ export default function LoginPage() {
       router.push('/');
     }
   }, [isAuthenticated, authLoading, router]);
-
   const handleLogin = async (event: React.FormEvent) => {
-     event.preventDefault(); // Prevent default form submission
+     event.preventDefault();
      setIsLoading(true);
      setError(null);
 
      try {
-       // Call the backend login API
-       const tokens = await loginUser(username, password);
-       // Pass tokens to the auth context login function
-       await login(tokens.access, tokens.refresh);
-       // auth context will handle setting state and potentially redirecting
+       // 使用 auth context 的 login 函數，現在它直接處理 API 請求
+       const success = await login(username, password);
+       if (!success) {
+         setError('登入失敗，請檢查使用者名稱和密碼。');
+       }
+       // 如果成功，auth context 將自動重定向到首頁
      } catch (err: any) {
-       // Handle login errors (e.g., invalid credentials)
-       setError(err.message || '登入失敗，請檢查使用者名稱和密碼。');
+       setError(err instanceof Error ? err.message : '登入失敗，請稍後再試。');
        console.error('Login error:', err);
      } finally {
        setIsLoading(false);

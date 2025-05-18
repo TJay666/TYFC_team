@@ -1,6 +1,6 @@
 // src/lib/auth-api.ts
 
-const API_BASE_URL = 'https://8000-firebase-studio-1747234445739.cluster-73qgvk7hjjadkrjeyexca5ivva.cloudworkstations.dev'; // Your Django backend URL
+const API_BASE_URL = 'http://localhost:8000'; // 本地開發 Django 後端 URL
 
 // Defines the structure for the response from the token obtain API
 interface TokenObtainPairResponse {

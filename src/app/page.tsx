@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -11,16 +10,33 @@ import { PlayersSection } from '@/components/sections/players-section';
 import { StatisticsSection } from '@/components/sections/statistics-section';
 import { ConfirmDialog } from '@/components/common/confirm-dialog';
 import { useToast } from "@/hooks/use-toast";
-import { initialDb } from '@/lib/data';
-import type { UserRole, SectionName, AppData, AgeGroup, Match, League, Player, MatchConflictInfo, MatchConflicts } from '@/lib/types';
-import { USER_ROLES, levelOptions } from '@/lib/types';
+import { initialDb } from '@/lib/data'; // 仍然保留作為預設或備用資料
+import { 
+  USER_ROLES, 
+  AppData, 
+  Match, 
+  League, 
+  Player, 
+  AgeGroup, 
+  SectionName, 
+  MatchConflictInfo, 
+  MatchConflicts,
+  levelOptions
+} from '@/lib/types';
 import { Tabs, TabsContent, TabsList, TabsTrigger as ShadcnTabsTrigger } from "@/components/ui/tabs";
 import { useAuth } from '@/contexts/auth-context';
 import { useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Loader2, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+
+// 導入API服務
+import { fetchMatches } from '@/lib/api/matches-api';
+import { fetchLeagues } from '@/lib/api/leagues-api';
+import { fetchTeams } from '@/lib/api/teams-api';
+import { fetchPlayers } from '@/lib/api/players-api';
 
 export default function HomePage() {
-  const { isAuthenticated, currentUserRole, loading: authLoading } = useAuth();
+  const { isAuthenticated, currentUserRole, currentUserId, authToken, loading: authLoading } = useAuth();
   const router = useRouter();
   
   const [appData, setAppData] = useState<AppData>(initialDb);
@@ -32,6 +48,10 @@ export default function HomePage() {
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmDialogProps, setConfirmDialogProps] = useState({ title: "", description: "", onConfirm: () => {} });
+  
+  // 數據加載狀態
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   const { toast } = useToast();
 
@@ -40,6 +60,64 @@ export default function HomePage() {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
+
+  // 從API加載數據
+  useEffect(() => {
+    if (!isAuthenticated || !authToken) return;
+    
+    const loadData = async () => {
+      setLoading(true);
+      setError(null);
+      
+      try {
+        // 並行請求數據以提高性能
+        const [matchesResponse, leaguesResponse, teamsResponse, playersResponse] = await Promise.all([
+          fetchMatches(authToken),
+          fetchLeagues(authToken),
+          fetchTeams(authToken),
+          fetchPlayers(authToken)
+        ]);
+        
+        // 檢查響應錯誤
+        if (matchesResponse.error || leaguesResponse.error || teamsResponse.error || playersResponse.error) {
+          throw new Error(matchesResponse.error || leaguesResponse.error || teamsResponse.error || playersResponse.error);
+        }
+        
+        // 如果所有數據都成功獲取
+        if (matchesResponse.data && leaguesResponse.data && teamsResponse.data && playersResponse.data) {
+          // 構建比賽出席數據
+          const matchAvailability: AppData['matchAvailability'] = {};
+          
+          // 暫時使用模擬數據的出席狀態，後續需要更新為從API獲取
+          matchesResponse.data.forEach(match => {
+            matchAvailability[match.id] = appData.matchAvailability[match.id] || {};
+          });
+          
+          // 使用API數據更新appData狀態
+          setAppData(prev => ({
+            matches: matchesResponse.data || [],
+            leagues: leaguesResponse.data || [],
+            teams: teamsResponse.data || [],
+            players: playersResponse.data || [],
+            matchRosters: prev.matchRosters, // 暫時保持原有數據，後續處理
+            matchAvailability: matchAvailability,
+          }));
+        }
+      } catch (err) {
+        console.error('加載數據失敗:', err);
+        setError(err instanceof Error ? err.message : '加載資料時發生未知錯誤');
+        toast({
+          variant: "destructive",
+          title: "資料載入失敗",
+          description: "無法從伺服器獲取數據，請稍後再試。",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadData();
+  }, [isAuthenticated, authToken, toast, appData.matchAvailability]);
 
   useEffect(() => {
     if (selectedGroup !== "all") {
@@ -65,7 +143,7 @@ export default function HomePage() {
   const handleConfirmDialogConfirm = () => {
     confirmDialogProps.onConfirm();
     setIsConfirmDialogOpen(false);
-     toast({ title: "操作成功", description: "項目已更新/刪除。" });
+    toast({ title: "操作成功", description: "項目已更新/刪除。" });
   };
   
   const globalGroupIndicatorText = useMemo(() => {
@@ -176,7 +254,17 @@ export default function HomePage() {
     );
   }
   
-  // Ensure currentUserRole is not null before passing to child components
+  // 顯示數據加載中的狀態
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-background items-center justify-center">
+        <Loader2 className="h-12 w-12 animate-spin text-primary" />
+        <p className="mt-4 text-muted-foreground">正在加載數據，請稍後...</p>
+      </div>
+    );
+  }
+  
+  // 確保currentUserRole不為null
   const validCurrentUserRole = currentUserRole || USER_ROLES.GUEST;
 
   return (
@@ -184,9 +272,18 @@ export default function HomePage() {
       <Header
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        // currentUserRole is now handled by AuthContext, Header will consume it
       />
       <main className="flex-grow container mx-auto px-4 pt-[120px] md:pt-[80px] pb-8">
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>錯誤</AlertTitle>
+            <AlertDescription>
+              {error}
+            </AlertDescription>
+          </Alert>
+        )}
+        
         <GlobalFiltersCard
           selectedGroup={selectedGroup}
           selectedLevelU={selectedLevelU}

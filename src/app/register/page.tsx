@@ -4,11 +4,11 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input'; // Assuming Input component exists
-import { Label } from '@/components/ui/label'; // Assuming Label component exists
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import Image from 'next/image';
-import { registerUser } from '@/lib/auth-api'; // Import the registration API function
+import { registerUser } from '@/lib/api';
 
 export default function RegisterPage() {
   const [username, setUsername] = useState('');
@@ -17,21 +17,24 @@ export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
-      // Call the backend registration API
-      await registerUser({ username, email, password });
-      // On successful registration, redirect to the login page
-      alert('Registration successful! Please contact your administrator for account activation.'); // Optional: show a success message
+      const response = await registerUser({ username, email, password });
+      
+      if (response.error) {
+        setError(response.error);
+        return;
+      }
+      
+      // 註冊成功
+      alert('註冊成功！請聯繫管理員進行帳號啟用。');
       router.push('/login');
     } catch (err: any) {
-      // Handle registration errors
-      setError(err.message || 'Registration failed.');
+      setError(err instanceof Error ? err.message : '註冊失敗，請稍後再試。');
       console.error('Registration error:', err);
     } finally {
       setIsLoading(false);

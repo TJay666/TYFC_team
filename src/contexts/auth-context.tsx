@@ -1,7 +1,8 @@
 
 "use client";
 
-import type { UserRole } from '@/lib/types';
+import { USER_ROLES } from '@/lib/types';
+import { loginUser, refreshToken, verifyToken, fetchCurrentUser } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect } from 'react';
@@ -25,28 +26,29 @@ const decodeToken = (token: string): any | null => {
 };
 
 interface AuthContextType {
-  currentUserRole: UserRole | null;
+  currentUserRole: USER_ROLES | null;
   username: string | null;
   currentUserId: string | null;
   isAuthenticated: boolean;
-  loading: boolean; // Expose loading state
-  login: (accessToken: string, refreshToken: string) => Promise<void>; // Modified to accept tokens
+  loading: boolean;
+  login: (username: string, password: string) => Promise<boolean>;
   logout: () => void;
-  accessToken: string | null; // Expose access token
+  accessToken: string | null;
+  authToken: string | null; // 添加這個屬性
+  refreshAuthToken: () => Promise<boolean>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [refreshToken, setRefreshToken] = useState<string | null>(null);
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
+  const [refreshTokenValue, setRefreshTokenValue] = useState<string | null>(null);
+  const [currentUserRole, setCurrentUserRole] = useState<USER_ROLES | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
   const router = useRouter();
-
   // Load tokens and user info from localStorage on mount
   useEffect(() => {
     const storedAccessToken = localStorage.getItem('accessToken');
@@ -54,62 +56,124 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
     if (storedAccessToken && storedRefreshToken) {
       const decodedAccess = decodeToken(storedAccessToken);
-      // Basic check for token validity (you might want a more robust check or token refresh logic here)
+      // Basic check for token validity
       if (decodedAccess && decodedAccess.exp * 1000 > Date.now()) {
         // Token is likely valid and not expired
         setAccessToken(storedAccessToken);
-        setRefreshToken(storedRefreshToken);
-        // Assuming user info is in the token payload (user_id, username, role)
-        setCurrentUserId(decodedAccess.user_id ? String(decodedAccess.user_id) : null); // Assuming user_id is numeric
-        setUsername(decodedAccess.username || null); // Assuming username is in payload
-        setCurrentUserRole(decodedAccess.role as UserRole || null); // Assuming role is in payload
+        setRefreshTokenValue(storedRefreshToken);
+        // Assuming user info is in the token payload
+        setCurrentUserId(decodedAccess.user_id ? String(decodedAccess.user_id) : null);
+        setUsername(decodedAccess.username || null);
+        setCurrentUserRole(decodedAccess.role as USER_ROLES || null);
         setIsAuthenticated(true);
       } else {
-        // Token is expired or invalid, clear it
-        logout(); // Use the logout function to clear invalid tokens
+        // Token is expired, try to refresh it
+        refreshAuthToken().then(success => {
+          if (!success) {
+            // If refresh fails, log out
+            logout();
+          }
+        });
       }
     }
     setLoading(false);
-  }, []); // Empty dependency array means this runs once on mount
+  }, []);
 
-  // Async login function to handle tokens
-  const login = async (newAccessToken: string, newRefreshToken: string) => {
-    localStorage.setItem('accessToken', newAccessToken);
-    localStorage.setItem('refreshToken', newRefreshToken);
-    setAccessToken(newAccessToken);
-    setRefreshToken(newRefreshToken);
+  // New login function that uses the updated API
+  const login = async (username: string, password: string): Promise<boolean> => {
+    try {
+      setLoading(true);
+      const response = await loginUser(username, password);
+      
+      if (response.data && response.status === 200) {
+        const { access, refresh } = response.data;
+        
+        localStorage.setItem('accessToken', access);
+        localStorage.setItem('refreshToken', refresh);
+        setAccessToken(access);
+        setRefreshTokenValue(refresh);
+        
+        const decodedAccess = decodeToken(access);
+        if (decodedAccess) {
+          setCurrentUserId(decodedAccess.user_id ? String(decodedAccess.user_id) : null);
+          setUsername(decodedAccess.username || null);
+          setCurrentUserRole(decodedAccess.role as USER_ROLES || null);
+          setIsAuthenticated(true);
+          
+          // 獲取更多使用者信息
+          const userResponse = await fetchCurrentUser(access);
+          if (userResponse.data) {
+            setUsername(userResponse.data.username);
+            setCurrentUserRole(userResponse.data.role);
+          }
+          
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Login error:', error);
+      return false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const decodedAccess = decodeToken(newAccessToken);
-    if (decodedAccess) {
-       setCurrentUserId(decodedAccess.user_id ? String(decodedAccess.user_id) : null);
-       setUsername(decodedAccess.username || null);
-       setCurrentUserRole(decodedAccess.role as UserRole || null); // Assuming role is in payload
-       setIsAuthenticated(true);
-       router.push('/'); // Redirect to homepage after successful login
-    } else {
-        // If token decoding fails, consider it a failed login
-        logout();
-        // Optionally, set an error state here
+  // Token refresh function
+  const refreshAuthToken = async (): Promise<boolean> => {
+    try {
+      if (!refreshTokenValue) {
+        return false;
+      }
+      
+      const response = await refreshToken(refreshTokenValue);
+      
+      if (response.data && response.status === 200) {
+        const { access } = response.data;
+        
+        localStorage.setItem('accessToken', access);
+        setAccessToken(access);
+        
+        const decodedAccess = decodeToken(access);
+        if (decodedAccess) {
+          setCurrentUserId(decodedAccess.user_id ? String(decodedAccess.user_id) : null);
+          setUsername(decodedAccess.username || null);
+          setCurrentUserRole(decodedAccess.role as USER_ROLES || null);
+          setIsAuthenticated(true);
+          return true;
+        }
+      }
+      return false;
+    } catch (error) {
+      console.error('Token refresh error:', error);
+      return false;
     }
   };
 
   const logout = () => {
     setAccessToken(null);
-    setRefreshToken(null);
+    setRefreshTokenValue(null);
     setCurrentUserRole(null);
     setUsername(null);
     setCurrentUserId(null);
     setIsAuthenticated(false);
     localStorage.removeItem('accessToken');
     localStorage.removeItem('refreshToken');
-    localStorage.removeItem('currentUserRole'); // Remove old items as well
-    localStorage.removeItem('username'); // Remove old items as well
-    localStorage.removeItem('currentUserId'); // Remove old items as well
-    router.push('/login'); // Redirect to login page after logout
+    router.push('/login');
   };
-
   return (
-    <AuthContext.Provider value={{ currentUserRole, username, currentUserId, isAuthenticated, loading, login, logout, accessToken }}>
+    <AuthContext.Provider value={{ 
+      currentUserRole, 
+      username, 
+      currentUserId, 
+      isAuthenticated, 
+      loading, 
+      login, 
+      logout, 
+      accessToken,
+      authToken: accessToken, // 添加 authToken 屬性，指向 accessToken
+      refreshAuthToken
+    }}>
       {children}
     </AuthContext.Provider>
   );

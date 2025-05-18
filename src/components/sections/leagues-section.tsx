@@ -1,12 +1,29 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { League, Team, UserRole, AppData } from '@/lib/types';
+import type { League, Team, AppData } from '@/lib/types';
+import { USER_ROLES } from '@/lib/types';
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from '@/contexts/auth-context';
+
+// 導入API服務
+import { 
+  createLeague, 
+  updateLeague, 
+  deleteLeague,
+  fetchLeagues
+} from '@/lib/api/leagues-api';
+import {
+  createTeam,
+  updateTeam,
+  deleteTeam,
+  fetchTeams
+} from '@/lib/api/teams-api';
 import { LeagueForm } from '@/components/forms/league-form';
 import { TeamForm } from '@/components/forms/team-form';
 import { PlusCircle, Edit3, Trash2 } from 'lucide-react';
@@ -14,7 +31,7 @@ import { PlusCircle, Edit3, Trash2 } from 'lucide-react';
 interface LeaguesSectionProps {
   appData: AppData;
   setAppData: React.Dispatch<React.SetStateAction<AppData>>;
-  currentUserRole: UserRole;
+  currentUserRole: typeof USER_ROLES[keyof typeof USER_ROLES];
   onOpenConfirmDialog: (title: string, description: string, onConfirm: () => void) => void;
   filteredLeagues: League[]; // Leagues filtered by global filters
   globalGroupIndicator: string;
@@ -28,10 +45,19 @@ export function LeaguesSection({
   filteredLeagues,
   globalGroupIndicator,
 }: LeaguesSectionProps) {
+  const { authToken } = useAuth();
+  const { toast } = useToast();
+  
   const [isLeagueModalOpen, setIsLeagueModalOpen] = useState(false);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
   const [editingLeague, setEditingLeague] = useState<League | undefined>(undefined);
   const [editingTeam, setEditingTeam] = useState<Team | undefined>(undefined);
+  const [teams, setTeams] = useState<Team[]>(appData.teams);
+
+  useEffect(() => {
+    // 確保球隊列表與 appData 保持同步
+    setTeams(appData.teams);
+  }, [appData.teams]);
 
   const handleAddLeague = () => {
     setEditingLeague(undefined);
@@ -43,36 +69,100 @@ export function LeaguesSection({
     setIsLeagueModalOpen(true);
   };
 
-  const handleLeagueFormSubmit = (data: any) => {
-    const leagueData = data as League;
-    if (editingLeague) {
-      setAppData(prev => ({
-        ...prev,
-        leagues: prev.leagues.map(l => l.id === editingLeague.id ? { ...leagueData, id: editingLeague.id } : l),
-      }));
-    } else {
-      setAppData(prev => ({
-        ...prev,
-        leagues: [...prev.leagues, { ...leagueData, id: `league_${Date.now()}` }],
-      }));
+  const handleLeagueFormSubmit = async (data: any) => {
+    try {
+      const leagueData = data as League;
+      let updatedLeague;
+      
+      if (editingLeague) {
+        // 更新聯賽
+        const response = await updateLeague(editingLeague.id, leagueData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedLeague = response.data;
+          toast({
+            title: "更新成功",
+            description: `聯賽「${updatedLeague.name}」已更新`,
+          });
+        }
+      } else {
+        // 創建新聯賽
+        const response = await createLeague(leagueData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedLeague = response.data;
+          toast({
+            title: "創建成功",
+            description: `聯賽「${updatedLeague.name}」已添加`,
+          });
+        }
+      }
+      
+      // 更新本地狀態
+      if (updatedLeague) {
+        setAppData(prev => ({
+          ...prev,
+          leagues: editingLeague
+            ? prev.leagues.map(l => l.id === editingLeague.id ? updatedLeague : l)
+            : [...prev.leagues, updatedLeague],
+        }));
+      }
+      
+      setIsLeagueModalOpen(false);
+      setEditingLeague(undefined);
+      
+    } catch (error) {
+      console.error('處理聯賽表單提交時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "操作失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
     }
-    setIsLeagueModalOpen(false);
-    setEditingLeague(undefined);
   };
 
   const handleDeleteLeague = (leagueId: string) => {
-     onOpenConfirmDialog("確認刪除聯賽", `您確定要刪除此聯賽嗎？相關比賽的聯賽資訊將會遺失。`, () => {
+    onOpenConfirmDialog("確認刪除聯賽", `您確定要刪除此聯賽嗎？相關比賽的聯賽資訊將會遺失。`, async () => {
+      try {
+        const response = await deleteLeague(leagueId, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        // 從本地狀態中移除
         setAppData(prev => {
-            const newLeagues = prev.leagues.filter(l => l.id !== leagueId);
-            // Also update matches that reference this league (optional: or prevent deletion if in use)
-            const newMatches = prev.matches.map(m => m.leagueId === leagueId ? {...m, leagueId: ""} : m);
-             // Also update players participating in this league
-            const newPlayers = prev.players.map(p => ({
-                ...p,
-                participatingLeagueIds: p.participatingLeagueIds.filter(id => id !== leagueId)
-            }));
-            return { ...prev, leagues: newLeagues, matches: newMatches, players: newPlayers };
+          const newLeagues = prev.leagues.filter(l => l.id !== leagueId);
+          // 同時更新參考此聯賽的比賽（可選：如果正在使用則阻止刪除）
+          const newMatches = prev.matches.map(m => m.leagueId === leagueId ? {...m, leagueId: ""} : m);
+          // 同時更新參與此聯賽的球員
+          const newPlayers = prev.players.map(p => ({
+            ...p,
+            participatingLeagueIds: p.participatingLeagueIds.filter(id => id !== leagueId)
+          }));
+          return { ...prev, leagues: newLeagues, matches: newMatches, players: newPlayers };
         });
+        
+        toast({
+          title: "刪除成功",
+          description: `聯賽已刪除`,
+        });
+      } catch (error) {
+        console.error('刪除聯賽時出錯：', error);
+        toast({
+          variant: "destructive",
+          title: "刪除失敗",
+          description: error instanceof Error ? error.message : "發生未知錯誤",
+        });
+      }
     });
   };
 
@@ -86,41 +176,107 @@ export function LeaguesSection({
     setIsTeamModalOpen(true);
   };
 
-  const handleTeamFormSubmit = (data: any) => {
-    const teamData = data as Team;
-    if (editingTeam) {
-      setAppData(prev => ({
-        ...prev,
-        teams: prev.teams.map(t => t.id === editingTeam.id ? { ...teamData, id: editingTeam.id } : t),
-      }));
-    } else {
-      setAppData(prev => ({
-        ...prev,
-        teams: [...prev.teams, { ...teamData, id: `team_${Date.now()}` }],
-      }));
+  const handleTeamFormSubmit = async (data: any) => {
+    try {
+      const teamData = data as Team;
+      let updatedTeam;
+      
+      if (editingTeam) {
+        // 更新球隊
+        const response = await updateTeam(editingTeam.id, teamData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedTeam = response.data;
+          toast({
+            title: "更新成功",
+            description: `球隊「${updatedTeam.name}」已更新`,
+          });
+        }
+      } else {
+        // 創建新球隊
+        const response = await createTeam(teamData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedTeam = response.data;
+          toast({
+            title: "創建成功",
+            description: `球隊「${updatedTeam.name}」已添加`,
+          });
+        }
+      }
+      
+      // 更新本地狀態
+      if (updatedTeam) {
+        setAppData(prev => ({
+          ...prev,
+          teams: editingTeam
+            ? prev.teams.map(t => t.id === editingTeam.id ? updatedTeam : t)
+            : [...prev.teams, updatedTeam],
+        }));
+      }
+      
+      setIsTeamModalOpen(false);
+      setEditingTeam(undefined);
+      
+    } catch (error) {
+      console.error('處理球隊表單提交時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "操作失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
     }
-    setIsTeamModalOpen(false);
-    setEditingTeam(undefined);
   };
 
   const handleDeleteTeam = (teamId: string) => {
-    onOpenConfirmDialog("確認刪除球隊", `您確定要刪除此對手球隊嗎？相關比賽的對手資訊將會遺失。`, () => {
+    onOpenConfirmDialog("確認刪除球隊", `您確定要刪除此對手球隊嗎？相關比賽的對手資訊將會遺失。`, async () => {
+      try {
+        const response = await deleteTeam(teamId, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        // 從本地狀態中移除
         setAppData(prev => {
-            const newTeams = prev.teams.filter(t => t.id !== teamId);
-            const newMatches = prev.matches.map(m => m.opponentTeamId === teamId ? {...m, opponentTeamId: ""} : m);
-            return { ...prev, teams: newTeams, matches: newMatches };
+          const newTeams = prev.teams.filter(t => t.id !== teamId);
+          // 同時更新參考此隊伍的比賽
+          const newMatches = prev.matches.map(m => 
+            m.opponentTeamId === teamId ? {...m, opponentTeamId: ""} : m
+          );
+          return { ...prev, teams: newTeams, matches: newMatches };
         });
+        
+        toast({
+          title: "刪除成功",
+          description: `球隊已刪除`,
+        });
+      } catch (error) {
+        console.error('刪除球隊時出錯：', error);
+        toast({
+          variant: "destructive",
+          title: "刪除失敗",
+          description: error instanceof Error ? error.message : "發生未知錯誤",
+        });
+      }
     });
   };
   
-  const isActionDisabled = currentUserRole === 'player' || currentUserRole === 'guest';
+  const isActionDisabled = currentUserRole === USER_ROLES.player || currentUserRole === USER_ROLES.guest;
 
   return (
     <div>
       <h2 className="text-3xl font-bold text-primary mb-6">
         聯賽及球隊管理 <span className="text-xl text-secondary">{globalGroupIndicator}</span>
       </h2>
-
       <Tabs defaultValue="leagues-content-panel" className="w-full">
         <TabsList className="grid w-full grid-cols-2 mb-4">
           <TabsTrigger value="leagues-content-panel">聯賽管理</TabsTrigger>
@@ -179,7 +335,7 @@ export function LeaguesSection({
                     ))}
                   </TableBody>
                 </Table>
-                 {filteredLeagues.length === 0 && <p className="text-center text-muted-foreground py-4">無符合條件的聯賽。</p>}
+                {filteredLeagues.length === 0 && <p className="text-center text-muted-foreground py-4">無符合條件的聯賽。</p>}
               </div>
             </CardContent>
           </Card>
@@ -213,7 +369,7 @@ export function LeaguesSection({
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {appData.teams.map((team) => ( // Teams are not globally filtered in the original HTML
+                    {appData.teams.map((team) => (
                       <TableRow key={team.id}>
                         <TableCell>{team.name}</TableCell>
                         <TableCell>{team.notes}</TableCell>

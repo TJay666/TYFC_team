@@ -1,19 +1,30 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { Player, League, UserRole, AppData } from '@/lib/types';
+import type { Player, League, AppData } from '@/lib/types';
+import { USER_ROLES } from '@/lib/types';
 import { PlayerForm } from '@/components/forms/player-form';
 import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Edit3, Trash2 } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
+import { useToast } from "@/hooks/use-toast";
+
+// 導入API服務
+import {
+  createPlayer,
+  updatePlayer,
+  deletePlayer,
+  updatePlayerLeagues
+} from '@/lib/api/players-api';
 
 interface PlayersSectionProps {
   appData: AppData;
   setAppData: React.Dispatch<React.SetStateAction<AppData>>;
-  currentUserRole: UserRole;
+  currentUserRole: typeof USER_ROLES[keyof typeof USER_ROLES];
   onOpenConfirmDialog: (title: string, description: string, onConfirm: () => void) => void;
   filteredPlayers: Player[]; // Players filtered by global filters
   globalGroupIndicator: string;
@@ -27,6 +38,9 @@ export function PlayersSection({
   filteredPlayers,
   globalGroupIndicator,
 }: PlayersSectionProps) {
+  const { authToken } = useAuth();
+  const { toast } = useToast();
+  
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | undefined>(undefined);
 
@@ -40,56 +54,146 @@ export function PlayersSection({
     setIsPlayerModalOpen(true);
   };
 
-  const handlePlayerFormSubmit = (data: any) => {
-    const playerData = data as Player;
-     // Derive group/levelU from first participating league if not directly set
-    let group = playerData.group;
-    let levelU = playerData.levelU;
-    if (playerData.participatingLeagueIds && playerData.participatingLeagueIds.length > 0) {
-        const firstLeagueId = playerData.participatingLeagueIds[0];
-        const league = appData.leagues.find(l => l.id === firstLeagueId);
-        if (league) {
-            group = league.group;
-            levelU = league.levelU;
+  const handlePlayerFormSubmit = async (data: any) => {
+    try {
+      const playerData = data as Player;
+      // Derive group/levelU from first participating league if not directly set
+      let group = playerData.group;
+      let levelU = playerData.levelU;
+      if (playerData.participatingLeagueIds && playerData.participatingLeagueIds.length > 0) {
+          const firstLeagueId = playerData.participatingLeagueIds[0];
+          const league = appData.leagues.find(l => l.id === firstLeagueId);
+          if (league) {
+              group = league.group;
+              levelU = league.levelU;
+          }
+      }
+      
+      const completePlayerData = { ...playerData, group, levelU };
+      let updatedPlayer;
+      
+      if (editingPlayer) {
+        // 更新球員
+        const response = await updatePlayer(editingPlayer.id, completePlayerData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
         }
+        
+        if (response.data) {
+          updatedPlayer = response.data;
+          
+          // 更新球員參與的聯賽
+          if (playerData.participatingLeagueIds && playerData.participatingLeagueIds.length > 0) {
+            const leagueResponse = await updatePlayerLeagues(
+              updatedPlayer.id, 
+              playerData.participatingLeagueIds, 
+              authToken || undefined
+            );
+            
+            if (leagueResponse.error) {
+              console.warn('更新球員聯賽時出錯：', leagueResponse.error);
+            }
+          }
+          
+          toast({
+            title: "更新成功",
+            description: `球員「${updatedPlayer.name}」已更新`,
+          });
+        }
+      } else {
+        // 創建新球員
+        const response = await createPlayer(completePlayerData, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedPlayer = response.data;
+          
+          // 設定球員參與的聯賽
+          if (playerData.participatingLeagueIds && playerData.participatingLeagueIds.length > 0) {
+            const leagueResponse = await updatePlayerLeagues(
+              updatedPlayer.id, 
+              playerData.participatingLeagueIds, 
+              authToken || undefined
+            );
+            
+            if (leagueResponse.error) {
+              console.warn('設定球員聯賽時出錯：', leagueResponse.error);
+            }
+          }
+          
+          toast({
+            title: "創建成功",
+            description: `球員「${updatedPlayer.name}」已添加`,
+          });
+        }
+      }
+      
+      // 更新本地狀態
+      if (updatedPlayer) {
+        setAppData(prev => ({
+          ...prev,
+          players: editingPlayer
+            ? prev.players.map(p => p.id === editingPlayer.id ? updatedPlayer : p)
+            : [...prev.players, updatedPlayer],
+        }));
+      }
+      
+      setIsPlayerModalOpen(false);
+      setEditingPlayer(undefined);
+    } catch (error) {
+      console.error('處理球員表單提交時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "操作失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
     }
-    
-    const completePlayerData = { ...playerData, group, levelU };
-
-    if (editingPlayer) {
-      setAppData(prev => ({
-        ...prev,
-        players: prev.players.map(p => p.id === editingPlayer.id ? { ...completePlayerData, id: editingPlayer.id } : p),
-      }));
-    } else {
-      setAppData(prev => ({
-        ...prev,
-        players: [...prev.players, { ...completePlayerData, id: `player_${Date.now()}` }],
-      }));
-    }
-    setIsPlayerModalOpen(false);
-    setEditingPlayer(undefined);
   };
 
   const handleDeletePlayer = (playerId: string) => {
-     onOpenConfirmDialog("確認刪除球員", `您確定要刪除此球員嗎？此操作無法復原。`, () => {
+    onOpenConfirmDialog("確認刪除球員", `您確定要刪除此球員嗎？此操作無法復原。`, async () => {
+      try {
+        const response = await deletePlayer(playerId, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        // 從本地狀態中移除
         setAppData(prev => ({
-            ...prev,
-            players: prev.players.filter(p => p.id !== playerId),
-            // Also remove player from rosters and stats
-            matchRosters: Object.entries(prev.matchRosters).reduce((acc, [matchId, roster]) => {
-                acc[matchId] = roster.filter(r => r.playerId !== playerId);
-                return acc;
-            }, {} as typeof prev.matchRosters),
-            matches: prev.matches.map(match => ({
-                ...match,
-                stats: Object.fromEntries(Object.entries(match.stats).filter(([pId]) => pId !== playerId))
-            }))
+          ...prev,
+          players: prev.players.filter(p => p.id !== playerId),
+          // 同時從名單和統計數據中移除該球員
+          matchRosters: Object.entries(prev.matchRosters).reduce((acc, [matchId, roster]) => {
+            acc[matchId] = roster.filter(r => r.playerId !== playerId);
+            return acc;
+          }, {} as typeof prev.matchRosters),
+          matches: prev.matches.map(match => ({
+            ...match,
+            stats: Object.fromEntries(Object.entries(match.stats || {}).filter(([pId]) => pId !== playerId))
+          }))
         }));
+        
+        toast({
+          title: "刪除成功",
+          description: `球員已刪除`,
+        });
+      } catch (error) {
+        console.error('刪除球員時出錯：', error);
+        toast({
+          variant: "destructive",
+          title: "刪除失敗",
+          description: error instanceof Error ? error.message : "發生未知錯誤",
+        });
+      }
     });
   };
 
-  const isActionDisabled = currentUserRole === 'player' || currentUserRole === 'guest';
+  const isActionDisabled = currentUserRole === USER_ROLES.PLAYER || currentUserRole === USER_ROLES.GUEST;
 
   return (
     <div>
@@ -104,15 +208,15 @@ export function PlayersSection({
                 <PlusCircle className="mr-2 h-5 w-5" /> 新增球員
               </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
+            <DialogContent className="sm:max-w-md">
               <DialogHeader>
                 <DialogTitle>{editingPlayer ? '編輯球員' : '新增球員'}</DialogTitle>
               </DialogHeader>
-              <PlayerForm
-                leagues={appData.leagues} // Pass all leagues for selection
-                onSubmit={handlePlayerFormSubmit}
-                initialData={editingPlayer}
+              <PlayerForm 
+                onSubmit={handlePlayerFormSubmit} 
+                initialData={editingPlayer} 
                 userRole={currentUserRole}
+                leagues={appData.leagues}
               />
             </DialogContent>
           </Dialog>
@@ -125,11 +229,11 @@ export function PlayersSection({
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>球員姓名</TableHead>
-                  <TableHead>參加聯賽</TableHead>
-                  <TableHead>可能位置</TableHead>
-                  <TableHead>受傷</TableHead>
-                  <TableHead>備註</TableHead>
+                  <TableHead>姓名</TableHead>
+                  <TableHead>號碼</TableHead>
+                  <TableHead>位置</TableHead>
+                  <TableHead>參與聯賽</TableHead>
+                  <TableHead>狀態</TableHead>
                   {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
                 </TableRow>
               </TableHeader>
@@ -137,32 +241,33 @@ export function PlayersSection({
                 {filteredPlayers.map((player) => (
                   <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
+                    <TableCell>{player.number}</TableCell>
+                    <TableCell>{player.position}</TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {player.participatingLeagueIds.map(leagueId => {
-                          const league = appData.leagues.find(l => l.id === leagueId);
-                          return league ? <Badge key={leagueId} variant="secondary" className="text-xs">{league.name}</Badge> : null;
-                        })}
-                        {player.participatingLeagueIds.length === 0 && '-'}
-                      </div>
+                      {player.participatingLeagueIds?.map(leagueId => {
+                        const league = appData.leagues.find(l => l.id === leagueId);
+                        return league ? (
+                          <Badge key={leagueId} variant="secondary" className="mr-1 mb-1">
+                            {league.name}
+                          </Badge>
+                        ) : null;
+                      })}
                     </TableCell>
                     <TableCell>
-                      <div className="flex flex-wrap gap-1">
-                        {player.positions.map(pos => <Badge key={pos} variant="outline" className="text-xs">{pos}</Badge>)}
-                      </div>
+                      {player.injured === '是' && (
+                        <Badge variant="destructive">受傷</Badge>
+                      )}
                     </TableCell>
-                    <TableCell>{player.injured}</TableCell>
-                    <TableCell className="max-w-xs truncate">{player.notes}</TableCell>
                     {!isActionDisabled && (
                       <TableCell className="text-right">
-                         <div className="flex justify-end space-x-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleEditPlayer(player)} className="hover:text-primary">
-                              <Edit3 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeletePlayer(player.id)} className="hover:text-destructive">
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
+                        <div className="flex justify-end space-x-1">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditPlayer(player)} className="hover:text-primary">
+                            <Edit3 className="h-4 w-4" />
+                          </Button>
+                          <Button variant="ghost" size="icon" onClick={() => handleDeletePlayer(player.id)} className="hover:text-destructive">
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </TableCell>
                     )}
                   </TableRow>

@@ -140,7 +140,35 @@ CORS_ALLOWED_ORIGINS = [
     "https://9000-firebase-studio-1747234445739.cluster-73qgvk7hjjadkrjeyexca5ivva.cloudworkstations.dev",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
+    "http://localhost:9002",
+    "http://127.0.0.1:9002",
 ]
+
+# 允許所有請求方法
+CORS_ALLOW_METHODS = [
+    "DELETE",
+    "GET",
+    "OPTIONS",
+    "PATCH",
+    "POST",
+    "PUT",
+]
+
+# 允許所有頭部
+CORS_ALLOW_HEADERS = [
+    "accept",
+    "accept-encoding",
+    "authorization",
+    "content-type",
+    "dnt",
+    "origin",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+]
+
+# 允許Cookie
+CORS_ALLOW_CREDENTIALS = True
 
 # REST Framework settings
 REST_FRAMEWORK = {

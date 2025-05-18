@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -10,19 +9,38 @@ import { Checkbox } from "@/components/ui/checkbox"; // Added for availability
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
-import type { Match, League, Team, UserRole, MatchConflictInfo, AppData } from '@/lib/types';
-import { USER_ROLES } from '@/lib/types'; // Added
+import type { Match, League, Team, MatchConflictInfo, AppData } from '@/lib/types';
+import { USER_ROLES } from '@/lib/types';
 import { useAuth } from '@/contexts/auth-context'; // Added
 import { MatchForm } from '@/components/forms/match-form';
 import { MatchRosterForm } from '@/components/forms/match-roster-form';
 import { MatchStatsForm } from '@/components/forms/match-stats-form';
 import { PlusCircle, Edit3, Users, BarChart2, Trash2, AlertTriangle, XCircle, CheckSquare, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
+
+// 導入API服務
+import { 
+  createMatch, 
+  updateMatch, 
+  deleteMatch,
+  updateMatchAvailability
+} from '@/lib/api/matches-api';
+
+// 獲取特定賽制需要的球員數量
+function getRequiredPlayersForFormat(format: string | undefined): number {
+  switch (format) {
+    case '5人制': return 5;
+    case '8人制': return 8;
+    case '11人制': return 11;
+    default: return 0;
+  }
+}
 
 interface MatchesSectionProps {
   appData: AppData;
   setAppData: React.Dispatch<React.SetStateAction<AppData>>;
-  currentUserRole: UserRole; // This is the role from AuthProvider, not necessarily the one from appData.currentUser
+  currentUserRole: typeof USER_ROLES[keyof typeof USER_ROLES]; // 改成使用 USER_ROLES 類型 
   onOpenConfirmDialog: (title: string, description: string, onConfirm: () => void) => void;
   filteredMatches: Match[];
   filteredLeagues: League[];
@@ -40,7 +58,8 @@ export function MatchesSection({
   globalGroupIndicator,
   matchConflicts,
 }: MatchesSectionProps) {
-  const { currentUserId } = useAuth(); // Get current logged-in player's ID
+  const { currentUserId, authToken } = useAuth(); // Get current logged-in player's ID
+  const { toast } = useToast();
 
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
@@ -64,42 +83,135 @@ export function MatchesSection({
     setIsMatchModalOpen(true);
   };
 
-  const handleMatchFormSubmit = (data: any) => {
-    const matchData = { ...data } as Omit<Match, 'group' | 'levelU' | 'stats'>;
-    const league = appData.leagues.find(l => l.id === matchData.leagueId);
-    
-    const completeMatchData: Match = {
-      ...matchData,
-      id: editingMatch?.id || `match_${Date.now()}`,
-      group: league?.group || 'N/A',
-      levelU: league?.levelU || 'N/A',
-      stats: editingMatch?.stats || {},
-    };
-
-    if (editingMatch) {
-      setAppData(prev => ({
-        ...prev,
-        matches: prev.matches.map(m => m.id === editingMatch.id ? completeMatchData : m),
-      }));
-    } else {
-      setAppData(prev => ({
-        ...prev,
-        matches: [...prev.matches, completeMatchData],
-      }));
+  const handleMatchFormSubmit = async (data: any) => {
+    try {
+      let updatedMatch;
+      
+      if (data.id) {
+        // 更新比賽
+        const response = await updateMatch(data.id, data, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedMatch = response.data;
+          toast({
+            title: "更新成功",
+            description: `比賽資訊已更新`,
+          });
+        }
+      } else {
+        // 創建新比賽
+        const response = await createMatch(data, authToken || undefined);
+        
+        if (response.error) {
+          throw new Error(response.error);
+        }
+        
+        if (response.data) {
+          updatedMatch = response.data;
+          toast({
+            title: "創建成功",
+            description: `新比賽已添加`,
+          });
+        }
+      }
+      
+      // 更新本地狀態
+      if (updatedMatch) {
+        setAppData(prev => ({
+          ...prev,
+          matches: data.id 
+            ? prev.matches.map(m => m.id === data.id ? updatedMatch : m)
+            : [...prev.matches, updatedMatch]
+        }));
+      }
+      
+      setIsMatchModalOpen(false);
+      setEditingMatch(undefined);
+      
+    } catch (error) {
+      console.error('處理比賽表單提交時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "操作失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
     }
-    setIsMatchModalOpen(false);
-    setEditingMatch(undefined);
   };
 
-  const handleDeleteMatch = (matchId: string) => {
-    onOpenConfirmDialog("確認刪除比賽", `您確定要刪除此比賽嗎？此操作無法復原。`, () => {
+  const handleDeleteMatch = async (matchId: string) => {
+    try {
+      const response = await deleteMatch(matchId, authToken || undefined);
+      
+      if (response.error) {
+        throw new Error(response.error);
+      }
+      
+      // 從本地狀態中移除
       setAppData(prev => ({
         ...prev,
-        matches: prev.matches.filter(m => m.id !== matchId),
-        matchRosters: { ...prev.matchRosters, [matchId]: undefined! },
-        matchAvailability: { ...prev.matchAvailability, [matchId]: undefined! } // Also remove availability
+        matches: prev.matches.filter(m => m.id !== matchId)
       }));
-    });
+      
+      toast({
+        title: "刪除成功",
+        description: `比賽已刪除`,
+      });
+    } catch (error) {
+      console.error('刪除比賽時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "刪除失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
+    }
+  };
+
+  const handleAvailabilityChange = async (matchId: string, playerId: string, isAvailable: boolean) => {
+    try {
+      // 先更新本地狀態提供即時反饋
+      setAppData(prev => {
+        const newAvailability = { ...prev.matchAvailability };
+        if (!newAvailability[matchId]) {
+          newAvailability[matchId] = {};
+        }
+        newAvailability[matchId][playerId] = isAvailable;
+        return { ...prev, matchAvailability: newAvailability };
+      });
+      
+      // 調用 API 更新伺服器數據
+      const response = await updateMatchAvailability(
+        matchId, 
+        playerId, 
+        isAvailable, 
+        authToken || undefined
+      );
+      
+      if (response.error) {
+        // 如果 API 調用失敗，回滾本地狀態
+        setAppData(prev => {
+          const newAvailability = { ...prev.matchAvailability };
+          if (!newAvailability[matchId]) {
+            newAvailability[matchId] = {};
+          }
+          // 還原為先前值或默認值
+          newAvailability[matchId][playerId] = !isAvailable;
+          return { ...prev, matchAvailability: newAvailability };
+        });
+        
+        throw new Error(response.error);
+      }
+    } catch (error) {
+      console.error('更新出席狀態時出錯：', error);
+      toast({
+        variant: "destructive",
+        title: "更新出席狀態失敗",
+        description: error instanceof Error ? error.message : "發生未知錯誤",
+      });
+    }
   };
 
   const openRosterModal = (match: Match) => {
@@ -131,17 +243,6 @@ export function MatchesSection({
     setIsStatsModalOpen(false);
   };
 
-  const handleAvailabilityChange = (matchId: string, playerId: string, isAvailable: boolean) => {
-    setAppData(prev => {
-      const newAvailability = { ...prev.matchAvailability };
-      if (!newAvailability[matchId]) {
-        newAvailability[matchId] = {};
-      }
-      newAvailability[matchId][playerId] = isAvailable;
-      return { ...prev, matchAvailability: newAvailability };
-    });
-  };
-  
   const isCoachOrAdmin = currentUserRole === USER_ROLES.COACH; 
 
   const displayedMatches = useMemo(() => {
@@ -168,14 +269,6 @@ export function MatchesSection({
       const player = appData.players.find(p => p.id === item.playerId);
       return { ...player!, position: item.position }; 
     }).filter(p => p && p.id); // Ensure player exists and has an ID
-  };
-
-  const getRequiredPlayersForFormat = (format: string | undefined): number => {
-    if (!format) return 0;
-    if (format.includes("5人制")) return 5;
-    if (format.includes("8人制")) return 8;
-    if (format.includes("11人制")) return 11;
-    return 0;
   };
 
   return (
@@ -318,8 +411,7 @@ export function MatchesSection({
                             </Button>
                             <Button variant="ghost" size="icon" onClick={() => openStatsModal(match)} className="btn-success hover:text-green-600">
                               <BarChart2 className="h-4 w-4" />
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteMatch(match.id)} className="hover:text-destructive">
+                            </Button>                            <Button variant="ghost" size="icon" onClick={() => handleDeleteMatchClick(match)} className="hover:text-destructive">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
@@ -380,5 +472,4 @@ export function MatchesSection({
     </div>
   );
 }
-    
-    
+

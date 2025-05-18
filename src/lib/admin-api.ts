@@ -1,7 +1,7 @@
 import { USER_ROLES, User } from "@/lib/types";
 
 // Using the likely correct API base URL for your environment
-const API_BASE_URL = 'https://8000-firebase-studio-1747234445739.cluster-73qgvk7hjjadkrjeyexca5ivva.cloudworkstations.dev'; 
+const API_BASE_URL = 'http://localhost:8000'; 
 
 // Fetches users from the Django backend API.
 export const fetchUsers = async (): Promise<User[]> => {
