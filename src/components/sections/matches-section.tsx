@@ -248,7 +248,7 @@ export function MatchesSection({
   const displayedMatches = useMemo(() => {
     return filteredMatches.filter(match => {
       const leagueFilterMatch = matchLeagueFilter === 'all' || match.leagueId === matchLeagueFilter;
-      const monthFilterMatch = !matchMonthFilter || match.date.startsWith(matchMonthFilter);
+      const monthFilterMatch = !matchMonthFilter || match.date_time.startsWith(matchMonthFilter);
       return leagueFilterMatch && monthFilterMatch;
     });
   }, [filteredMatches, matchLeagueFilter, matchMonthFilter]);

@@ -17,6 +17,7 @@ export interface User {
 
 export interface Match {
   id: string;
+  date_time: string;  // 後端回傳的日期時間字串
   date: string;
   startTime: string;
   durationMinutes: number;

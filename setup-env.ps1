@@ -1,3 +1,6 @@
+# 確保在 PowerShell 中 `curl` 呼叫外部 curl.exe
+Set-Alias curl curl.exe -Scope Script
+
 # Setting color constants
 $GREEN = [System.ConsoleColor]::Green
 $YELLOW = [System.ConsoleColor]::Yellow
@@ -28,7 +31,7 @@ function Show-Menu {
     return $choice
 }
 
-function Setup-Frontend {
+function Initialize-Frontend {
     Write-Host "Setting up frontend environment..." -ForegroundColor $GREEN
     Set-Location -Path $PROJECT_ROOT
 
@@ -58,137 +61,125 @@ function Setup-Frontend {
 
     # Create a fixed types.ts file to resolve the enum errors
     $typesContent = @'
-// Types for user roles and permissions
-export enum USER_ROLES {
-  ADMIN = 'admin',
-  COACH = 'coach',
-  PLAYER = 'player',
-  GUEST = 'guest',
-}
+    // Types for user roles and permissions
+    export enum USER_ROLES {
+      ADMIN = 'admin',
+      COACH = 'coach',
+      PLAYER = 'player',
+      GUEST = 'guest',
+    }
 
-export interface User {
-  id: string;
-  username: string;
-  email: string;
-  role: USER_ROLES;
-  teamId?: string;
-  createdAt: string;
-}
+    export interface User {
+      id: string;
+      username: string;
+      email: string;
+      role: USER_ROLES;
+      teamId?: string;
+      createdAt: string;
+    }
 
-export interface Match {
-  id: string;
-  date: string;
-  startTime: string;
-  durationMinutes: number;
-  leagueId: string;
-  opponentTeamId: string;
-  location: string;
-  group: string;
-  levelU: string;
-  stats: { [playerId: string]: PlayerMatchStats };
-}
+    export interface Match {
+      id: string;
+      date: string;
+      startTime: string;
+      durationMinutes: number;
+      leagueId: string;
+      opponentTeamId: string;
+      location: string;
+      group: string;
+      levelU: string;
+      stats: { [playerId: string]: PlayerMatchStats };
+    }
 
-export interface PlayerMatchStats {
-  goals: number;
-  assists: number;
-  yellow: number;
-  red: number;
-}
+    export interface PlayerMatchStats {
+      goals: number;
+      assists: number;
+      yellow: number;
+      red: number;
+    }
 
-export interface League {
-  id: string;
-  name: string;
-  group: string;
-  levelU: string;
-  format: '5人制' | '8人制' | '11人制' | '';
-  notes: string;
-}
+    export interface League {
+      id: string;
+      name: string;
+      group: string;
+      levelU: string;
+      format: '5人制' | '8人制' | '11人制' | '';
+      notes: string;
+    }
 
-export interface Team {
-  id: string;
-  name: string;
-  notes: string;
-}
+    export interface Team {
+      id: string;
+      name: string;
+      notes: string;
+    }
 
-export interface Player {
-  id: string;
-  name: string;
-  participatingLeagueIds: string[];
-  positions: string[];
-  injured: '是' | '否';
-  notes: string;
-  group: string;
-  levelU: string;
-}
+    export interface Player {
+      id: string;
+      name: string;
+      participatingLeagueIds: string[];
+      positions: string[];
+      injured: '是' | '否';
+      notes: string;
+      group: string;
+      levelU: string;
+    }
 
-export interface MatchRosterItem {
-  playerId: string;
-  position: string;
-}
+    export interface MatchRosterItem {
+      playerId: string;
+      position: string;
+    }
 
-export interface MatchRoster {
-  [matchId: string]: MatchRosterItem[];
-}
+    export interface MatchRoster {
+      [matchId: string]: MatchRosterItem[];
+    }
 
-export type MatchAvailability = {
-  [matchId: string]: { [playerId: string]: boolean };
-};
+    export type MatchAvailability = {
+      [matchId: string]: { [playerId: string]: boolean };
+    };
 
-export interface AppData {
-  matches: Match[];
-  leagues: League[];
-  teams: Team[];
-  players: Player[];
-  matchRosters: MatchRoster;
-  matchAvailability: MatchAvailability;
-}
+    export interface AppData {
+      matches: Match[];
+      leagues: League[];
+      teams: Team[];
+      players: Player[];
+      matchRosters: MatchRoster;
+      matchAvailability: MatchAvailability;
+    }
 
-export type PlayerPosition = 
-  | "守門員 (GK)" | "右後衛 (RB)" | "左後衛 (LB)" | "中後衛 (CB)" 
-  | "防守中場 (DMF)" | "右中場 (RMF)" | "左中場 (LMF)" | "進攻中場 (AMF)"
-  | "右邊鋒 (RWF)" | "左邊鋒 (LWF)" | "中鋒 (CF)"
-  | "左前鋒" | "右前鋒" | "中前鋒";
+    export type PlayerPosition = 
+      | "守門員 (GK)" | "右後衛 (RB)" | "左後衛 (LB)" | "中後衛 (CB)" 
+      | "防守中場 (DMF)" | "右中場 (RMF)" | "左中場 (LMF)" | "進攻中場 (AMF)"
+      | "右邊鋒 (RWF)" | "左邊鋒 (LWF)" | "中鋒 (CF)"
+      | "左前鋒" | "右前鋒" | "中前鋒";
 
-export const playerPositionOptions: PlayerPosition[] = [
-  "守門員 (GK)", "右後衛 (RB)", "左後衛 (LB)", "中後衛 (CB)", 
-  "防守中場 (DMF)", "右中場 (RMF)", "左中場 (LMF)", "進攻中場 (AMF)",
-  "右邊鋒 (RWF)", "左邊鋒 (LWF)", "中鋒 (CF)",
-  "左前鋒", "右前鋒", "中前鋒"
-];
+    export const playerPositionOptions: PlayerPosition[] = [
+      "守門員 (GK)", "右後衛 (RB)", "左後衛 (LB)", "中後衛 (CB)", 
+      "防守中場 (DMF)", "右中場 (RMF)", "左中場 (LMF)", "進攻中場 (AMF)",
+      "右邊鋒 (RWF)", "左邊鋒 (LWF)", "中鋒 (CF)",
+      "左前鋒", "右前鋒", "中前鋒"
+    ];
 
-export type AgeGroup = "幼兒組" | "國小組" | "國中組" | "高中組" | "大學組" | "成人組" | "all";
+    export type AgeGroup = "幼兒組" | "國小組" | "國中組" | "高中組" | "大學組" | "成人組" | "all";
 
-export const ageGroups: Exclude<AgeGroup, "all">[] = ["幼兒組", "國小組", "國中組", "高中組", "大學組", "成人組"];
+    export const ageGroups: Exclude<AgeGroup, "all">[] = ["幼兒組", "國小組", "國中組", "高中組", "大學組", "成人組"];
 
-export const levelOptions: Record<Exclude<AgeGroup, "all">, string[]> = { 
-  "幼兒組": ["U6"], 
-  "國小組": ["U8", "U10", "U12"], 
-  "國中組": ["U14", "U15"], 
-  "高中組": ["U16", "U18"], 
-  "大學組": ["甲組", "乙組", "其他組"], 
-  "成人組": ["企業組", "家長組"]
-};
+    export const levelOptions: Record<Exclude<AgeGroup, "all">, string[]> = { 
+      "幼兒組": ["U6"], 
+      "國小組": ["U8", "U10", "U12"], 
+      "國中組": ["U14", "U15"], 
+      "高中組": ["U16", "U18"], 
+      "大學組": ["甲組", "乙組", "其他組"], 
+      "成人組": ["企業組", "家長組"]
+    };
 
-// Role constants
-export const ROLES = {
-  GUEST: 'guest',
-  PLAYER: 'player',
-  COACH: 'coach',
-  ADMIN: 'admin'
-};
-
-export type SectionName = "matches" | "leagues" | "players" | "statistics";
-
-export type MatchConflictInfo = {
-  type: 'none' | 'sameday' | 'overlap';
-  conflictingWith?: string[];
-};
-
-export type MatchConflicts = {
-  [matchId: string]: MatchConflictInfo;
-};
-'@
-
+    // Role constants
+    export const ROLES = {
+      GUEST: 'guest',
+      PLAYER: 'player',
+      COACH: 'coach',
+      ADMIN: 'admin'
+    }
+'@  # 關閉 here-string
     # Create/overwrite the types.ts file
     Set-Content -Path "src\lib\types.ts" -Value $typesContent -Force
 
@@ -199,7 +190,7 @@ export type MatchConflicts = {
     Write-Host "Frontend setup complete!" -ForegroundColor $GREEN
 }
 
-function Setup-Backend {
+function Initialize-Backend {
     Write-Host "Setting up backend environment..." -ForegroundColor $GREEN
     Set-Location -Path $BACKEND_DIR
 
@@ -250,16 +241,16 @@ function Start-Backend {
 # Main program
 $choice = Show-Menu
 switch ($choice) {
-    "1" { Setup-Frontend }
-    "2" { Setup-Backend }
+    "1" { Initialize-Frontend }
+    "2" { Initialize-Backend }
     "3" { Start-Frontend }
     "4" { Start-Backend }
     "5" { 
-        Setup-Frontend
-        Setup-Backend 
+        Initialize-Frontend
+        Initialize-Backend 
     }
     "6" {
-        $backendJob = Start-Job -ScriptBlock {
+        Start-Job -ScriptBlock {
             Set-Location -Path $using:BACKEND_DIR
             $venvPath = Join-Path -Path $using:PROJECT_ROOT -ChildPath "venv_backend"
             & "$venvPath\Scripts\activate.ps1"

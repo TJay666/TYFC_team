@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -45,27 +44,27 @@ export default function LoginPage() {
      }
    };
 
-   // Render loading/redirect state if auth is loading or user is already authenticated
-   if (authLoading || isAuthenticated) {
-     return (
-         <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-             <p className="text-gray-400">載入中或重定向...</p>
-         </div>
-     );
-   }
+  // Render loading state if auth is loading
+  if (authLoading) {
+    return (
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
+        <p className="text-gray-400">載入中...</p>
+      </div>
+    );
+  }
 
+  // Render login form when not loading and not authenticated
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
       <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
         <CardHeader className="text-center bg-gray-800 text-card-foreground">
-          <div className="mx-auto mb-6 w-32 h-32 relative">
+          <div className="mx-auto mb-6">
             <Image
-              src="/images/taoyuan_universe_logo.png" 
+              src="/images/taoyuan_universe_logo.png"
               alt="獵鷹 Logo"
-              fill
-              sizes="128px"
+              width={128}
+              height={128}
               className="rounded-full shadow-lg object-cover"
-              data-ai-hint="football club logo"
               priority
             />
           </div>

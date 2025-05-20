@@ -4,7 +4,8 @@ from rest_framework.routers import DefaultRouter
 from .views import MatchStatisticViewSet
 
 router = DefaultRouter()
-router.register(r'match-statistics', MatchStatisticViewSet)
+# 修改為更直觀的 API 路徑
+router.register(r'statistics', MatchStatisticViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
