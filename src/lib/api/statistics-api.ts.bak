@@ -2,24 +2,23 @@
 import { PlayerMatchStats } from '@/lib/types';
 import { apiRequest, ApiResponse } from './api-config';
 
-// �w�q�έp�ƾ�����
+// 定義統計數據類型
 export interface MatchStatistics {
   [playerId: string]: PlayerMatchStats;
 }
 
-// ������ɲέp�ƾ�
+// 獲取比賽統計數據
 export async function fetchMatchStatistics(matchId: string, token?: string): Promise<ApiResponse<MatchStatistics>> {
   return apiRequest<MatchStatistics>(`/api/match_statistics/statistics/${matchId}/`, 'GET', undefined, token);
 }
 
-// ����y���έp�ƾ�
+// 獲取球員統計數據
 export async function fetchPlayerStatistics(playerId: string, token?: string): Promise<ApiResponse<PlayerMatchStats[]>> {
-  return apiRequest<PlayerMatchStats[]>(`/api/match_statistics/player-stats/${playerId}/`, 'GET', undefined, token);
+  return apiRequest<PlayerStats[]>(`/api/match_statistics/player-stats/${playerId}/`, 'GET', undefined, token);
 }
 
-// ����S�w���ɤ��Y�y�����έp�ƾ�
-export async function fetchPlayerMatchStatistics(
-  matchId: string,
+// 獲取特定比賽中某球員的統計數據
+export async function fetchPlayerMatchStatistics(  matchId: string,
   playerId: string,
   token?: string
 ): Promise<ApiResponse<PlayerMatchStats>> {
@@ -31,14 +30,14 @@ export async function fetchPlayerMatchStatistics(
   );
 }
 
-// ��s�y�����ɲέp�ƾ�
+// 更新球員比賽統計數據
 export async function updatePlayerStatistics(
   matchId: string,
   playerId: string,
-  statistics: Partial<PlayerMatchStats>,
+  statistics: Partial<PlayerStats>,
   token?: string
-): Promise<ApiResponse<PlayerMatchStats>> {
-  return apiRequest<PlayerMatchStats>(
+): Promise<ApiResponse<PlayerStats>> {
+  return apiRequest<PlayerStats>(
     `/api/match_statistics/statistics/${matchId}/player/${playerId}/`,
     'PUT',
     statistics,
@@ -46,10 +45,10 @@ export async function updatePlayerStatistics(
   );
 }
 
-// �妸��s���ɲέp�ƾ�
+// 批次更新比賽統計數據
 export async function bulkUpdateMatchStatistics(
   matchId: string,
-  statisticsData: Record<string, Partial<PlayerMatchStats>>,
+  statisticsData: Record<string, Partial<PlayerStats>>,
   token?: string
 ): Promise<ApiResponse<MatchStatistics>> {
   return apiRequest<MatchStatistics>(
@@ -60,12 +59,12 @@ export async function bulkUpdateMatchStatistics(
   );
 }
 
-// ����y������έp�ƾ�
+// 獲取球隊整體統計數據
 export async function fetchTeamStatistics(token?: string): Promise<ApiResponse<any>> {
   return apiRequest<any>('/api/match_statistics/team-stats/', 'GET', undefined, token);
 }
 
-// ����p�ɲέp�ƾ�
+// 獲取聯賽統計數據
 export async function fetchLeagueStatistics(leagueId: string, token?: string): Promise<ApiResponse<any>> {
   return apiRequest<any>(`/api/match_statistics/league-stats/${leagueId}/`, 'GET', undefined, token);
 }

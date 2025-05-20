@@ -270,7 +270,7 @@ export function LeaguesSection({
     });
   };
   
-  const isActionDisabled = currentUserRole === USER_ROLES.player || currentUserRole === USER_ROLES.guest;
+  const isActionDisabled = currentUserRole === USER_ROLES.PLAYER || currentUserRole === USER_ROLES.GUEST;
 
   return (
     <div>

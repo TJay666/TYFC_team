@@ -238,11 +238,10 @@ export function PlayersSection({
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredPlayers.map((player) => (
-                  <TableRow key={player.id}>
+                {filteredPlayers.map((player) => (                  <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
-                    <TableCell>{player.number}</TableCell>
-                    <TableCell>{player.position}</TableCell>
+                    <TableCell>{player.id.split('_')[1] || '-'}</TableCell>
+                    <TableCell>{player.positions && player.positions.length > 0 ? player.positions[0] : '-'}</TableCell>
                     <TableCell>
                       {player.participatingLeagueIds?.map(leagueId => {
                         const league = appData.leagues.find(l => l.id === leagueId);

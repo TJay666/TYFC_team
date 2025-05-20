@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import type { Player, Match, League, AppData, PlayerStats } from '@/lib/types';
+import type { Player, Match, League, AppData, PlayerMatchStats } from '@/lib/types';
 import { GoalsAssistsCharts } from '@/components/charts/goals-assists-charts';
 import { useAuth } from '@/contexts/auth-context';
 import { useToast } from "@/hooks/use-toast";

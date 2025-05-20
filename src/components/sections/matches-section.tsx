@@ -408,10 +408,9 @@ export function MatchesSection({
                               {showRosterWarning && (
                                 <AlertTriangle className="absolute -bottom-1 -right-1 h-3.5 w-3.5 text-destructive fill-destructive/70" />
                               )}
-                            </Button>
-                            <Button variant="ghost" size="icon" onClick={() => openStatsModal(match)} className="btn-success hover:text-green-600">
+                            </Button>                            <Button variant="ghost" size="icon" onClick={() => openStatsModal(match)} className="btn-success hover:text-green-600">
                               <BarChart2 className="h-4 w-4" />
-                            </Button>                            <Button variant="ghost" size="icon" onClick={() => handleDeleteMatchClick(match)} className="hover:text-destructive">
+                            </Button>                            <Button variant="ghost" size="icon" onClick={() => handleDeleteMatch(match.id)} className="hover:text-destructive">
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>
