@@ -60,6 +60,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.locale.LocaleMiddleware',  # 添加本地化中間件
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -150,6 +151,7 @@ REST_FRAMEWORK = {
         'rest_framework.parsers.MultiPartParser',
     ),
     'DEFAULT_CHARSET': 'utf-8',  # 設置默認字符編碼為 UTF-8
+    'DEFAULT_CONTENT_NEGOTIATION_CLASS': 'rest_framework.negotiation.DefaultContentNegotiation',
 }
 
 # CORS settings
@@ -187,12 +189,7 @@ CORS_ALLOW_HEADERS = [
 # 允許Cookie
 CORS_ALLOW_CREDENTIALS = True
 
-# REST Framework settings
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    )
-}
+# 上方已定義 REST_FRAMEWORK 設定，此處省略重複定義
 
 # Simple JWT settings
 SIMPLE_JWT = {

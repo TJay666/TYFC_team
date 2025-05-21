@@ -61,9 +61,15 @@ export default function HomePage() {
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // 從API加載數據
+  // 從API加載數據  // 使用一個ref來追蹤是否已經加載過數據
+  const dataLoaded = React.useRef(false);
+  
   useEffect(() => {
+    // 如果未認證或無token則退出
     if (!isAuthenticated || !authToken) return;
+    
+    // 如果已經加載過數據則不重複加載
+    if (dataLoaded.current) return;
     
     const loadData = async () => {
       setLoading(true);
@@ -90,7 +96,7 @@ export default function HomePage() {
           
           // 暫時使用模擬數據的出席狀態，後續需要更新為從API獲取
           matchesResponse.data.forEach(match => {
-            matchAvailability[match.id] = appData.matchAvailability[match.id] || {};
+            matchAvailability[match.id] = {}; // 創建空對象，而不是引用現有狀態
           });
           
           // 使用API數據更新appData狀態
@@ -102,6 +108,9 @@ export default function HomePage() {
             matchRosters: prev.matchRosters, // 暫時保持原有數據，後續處理
             matchAvailability: matchAvailability,
           }));
+          
+          // 標記數據已加載
+          dataLoaded.current = true;
         }
       } catch (err) {
         console.error('加載數據失敗:', err);
@@ -117,7 +126,7 @@ export default function HomePage() {
     };
     
     loadData();
-  }, [isAuthenticated, authToken, toast, appData.matchAvailability]);
+  }, [isAuthenticated, authToken, toast]);
 
   useEffect(() => {
     if (selectedGroup !== "all") {

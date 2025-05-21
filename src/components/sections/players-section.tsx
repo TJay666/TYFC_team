@@ -237,10 +237,9 @@ export function PlayersSection({
                   {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {filteredPlayers.map((player) => (                  <TableRow key={player.id}>
+              <TableBody>                {filteredPlayers.map((player) => (                  <TableRow key={player.id}>
                     <TableCell>{player.name}</TableCell>
-                    <TableCell>{player.id.split('_')[1] || '-'}</TableCell>
+                    <TableCell>{typeof player.id === 'string' && player.id.includes('_') ? player.id.split('_')[1] : '-'}</TableCell>
                     <TableCell>{player.positions && player.positions.length > 0 ? player.positions[0] : '-'}</TableCell>
                     <TableCell>
                       {player.participatingLeagueIds?.map(leagueId => {

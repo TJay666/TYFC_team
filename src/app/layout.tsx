@@ -17,6 +17,7 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   title: 'TeamTactics',
   description: 'Soccer team management application',
+  metadataBase: new URL('http://localhost:9002'),
 };
 
 export default function RootLayout({

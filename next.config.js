@@ -31,10 +31,13 @@ const nextConfig = {
     ];
   },
   // 提高構建性能
-  swcMinify: true,
-  // 避免頁面重新整理時的閃爍
+  swcMinify: true,  // 避免頁面重新整理時的閃爍
   experimental: {
     scrollRestoration: true,
+    // 修復Firefox 不支援 'linkfetchpriority' 問題
+    optimizePackageImports: ['@/components'],
+    // 禁用不兼容的功能
+    disableOptimizedLoading: true,
   },
 };
 

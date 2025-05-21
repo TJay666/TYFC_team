@@ -48,22 +48,24 @@ export default function HomePage() {
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmDialogProps, setConfirmDialogProps] = useState({ title: "", description: "", onConfirm: () => {} });
-  
-  // 數據加載狀態
-  const [loading, setLoading] = useState<boolean>(true);
+
+  // 數據加載狀態 - 初始化為與認證狀態一致
+  const [loading, setLoading] = useState<boolean>(authLoading);
   const [error, setError] = useState<string | null>(null);
+  const [dataInitialized, setDataInitialized] = useState<boolean>(false);
 
   const { toast } = useToast();
 
+  // 處理未認證的用戶重定向
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
       router.push('/login');
     }
   }, [isAuthenticated, authLoading, router]);
 
-  // 從API加載數據
+  // 從API加載數據，只在認證完成且尚未初始化數據時執行
   useEffect(() => {
-    if (!isAuthenticated || !authToken) return;
+    if (!isAuthenticated || !authToken || dataInitialized) return;
     
     const loadData = async () => {
       setLoading(true);
@@ -116,9 +118,9 @@ export default function HomePage() {
           variant: "destructive",
           title: "資料載入失敗",
           description: "無法從伺服器獲取數據，請稍後再試。",
-        });
-      } finally {
+        });      } finally {
         setLoading(false);
+        setDataInitialized(true); // 標記數據已經初始化
       }
     };
     

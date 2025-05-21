@@ -10,3 +10,14 @@ export * from './teams-api';
 export * from './players-api';
 export * from './leagues-api';
 export * from './matches-api';
+
+// 再導出頻繁使用的 API 函數，方便其他模組直接引用
+import { loginUser, refreshToken, verifyToken } from './auth-api';
+import { fetchCurrentUser } from './admin-api';
+
+export {
+    loginUser,
+    refreshToken,
+    verifyToken,
+    fetchCurrentUser
+};

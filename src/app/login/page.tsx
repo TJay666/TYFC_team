@@ -75,19 +75,19 @@ export default function LoginPage() {
           {/* Login Form */}
           <form onSubmit={handleLogin} className="space-y-4"> {/* Use handleLogin for form submission */}
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-card-foreground">使用者名稱</Label>
-              <Input 
+              <Label htmlFor="username" className="text-card-foreground">使用者名稱</Label>              <Input 
                 id="username" 
                 placeholder="請輸入您的帳號" 
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+                name="username"
+                autoComplete="username"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-card-foreground">密碼</Label>
-              <Input 
+              <Label htmlFor="password" className="text-card-foreground">密碼</Label>              <Input 
                 id="password" 
                 type="password" 
                 placeholder="請輸入您的密碼" 
@@ -95,6 +95,8 @@ export default function LoginPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+                name="password"
+                autoComplete="current-password"
               />
             </div>
 

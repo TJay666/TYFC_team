@@ -2,7 +2,8 @@
 "use client";
 
 import { USER_ROLES } from '@/lib/types';
-import { loginUser, refreshToken, verifyToken, fetchCurrentUser } from '@/lib/api';
+import { loginUser, refreshToken, verifyToken } from '@/lib/api/auth-api';
+import { fetchCurrentUser } from '@/lib/api/admin-api';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import React, { createContext, useContext, useState, useEffect } from 'react';

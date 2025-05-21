@@ -29,7 +29,7 @@ export async function fetchUsers(token?: string): Promise<ApiResponse<User[]>> {
 
 // 更新使用者角色
 export async function updateUserRole(userId: string, newRole: USER_ROLES, token?: string): Promise<ApiResponse<void>> {
-  return apiRequest<void>(`/api/users/users/${userId}/role/`, 'PATCH', { role: newRole }, token);
+  return apiRequest<void>(`/api/users/${userId}/role/`, 'PATCH', { role: newRole }, token);
 }
 
 // 獲取當前登入使用者的詳細資訊
