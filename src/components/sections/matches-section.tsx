@@ -17,7 +17,8 @@ import { MatchRosterForm } from '@/components/forms/match-roster-form';
 import { MatchStatsForm } from '@/components/forms/match-stats-form';
 import { PlusCircle, Edit3, Users, BarChart2, Trash2, AlertTriangle, XCircle, CheckSquare, Square } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useToast } from "@/hooks/use-toast";
+// import { useToast } from "@/hooks/use-toast"; // 舊版 toast 系統，有問題
+import { useToast } from "@/hooks/use-simple-toast"; // 使用新的簡化 toast 系統
 
 // 導入API服務
 import { 
@@ -59,7 +60,7 @@ export function MatchesSection({
   matchConflicts,
 }: MatchesSectionProps) {
   const { currentUserId, authToken } = useAuth(); // Get current logged-in player's ID
-  const { toast } = useToast();
+  const { addToast } = useToast(); // 新版 toast 系統使用 addToast 而不是 toast
 
   const [isMatchModalOpen, setIsMatchModalOpen] = useState(false);
   const [isRosterModalOpen, setIsRosterModalOpen] = useState(false);
@@ -96,10 +97,10 @@ export function MatchesSection({
         }
         
         if (response.data) {
-          updatedMatch = response.data;
-          toast({
+          updatedMatch = response.data;          addToast({
             title: "更新成功",
-            description: `比賽資訊已更新`,
+            message: `比賽資訊已更新`,
+            type: "success"
           });
         }
       } else {
@@ -111,10 +112,10 @@ export function MatchesSection({
         }
         
         if (response.data) {
-          updatedMatch = response.data;
-          toast({
+          updatedMatch = response.data;          addToast({
             title: "創建成功",
-            description: `新比賽已添加`,
+            message: `新比賽已添加`,
+            type: "success"
           });
         }
       }
@@ -133,11 +134,10 @@ export function MatchesSection({
       setEditingMatch(undefined);
       
     } catch (error) {
-      console.error('處理比賽表單提交時出錯：', error);
-      toast({
-        variant: "destructive",
+      console.error('處理比賽表單提交時出錯：', error);      addToast({
         title: "操作失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
+        type: "error"
       });
     }
   };
@@ -155,17 +155,16 @@ export function MatchesSection({
         ...prev,
         matches: prev.matches.filter(m => m.id !== matchId)
       }));
-      
-      toast({
+        addToast({
         title: "刪除成功",
-        description: `比賽已刪除`,
+        message: `比賽已刪除`,
+        type: "success"
       });
     } catch (error) {
-      console.error('刪除比賽時出錯：', error);
-      toast({
-        variant: "destructive",
+      console.error('刪除比賽時出錯：', error);      addToast({
         title: "刪除失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
+        type: "error"
       });
     }
   };
@@ -204,12 +203,11 @@ export function MatchesSection({
         
         throw new Error(response.error);
       }
-    } catch (error) {
-      console.error('更新出席狀態時出錯：', error);
-      toast({
-        variant: "destructive",
+    } catch (error) {      console.error('更新出席狀態時出錯：', error);
+      addToast({
         title: "更新出席狀態失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
+        type: "error"
       });
     }
   };
@@ -274,13 +272,17 @@ export function MatchesSection({
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-primary">
-          比賽管理 <span className="text-xl text-secondary">{globalGroupIndicator}</span>
+        <h2 className="text-3xl font-bold text-[#1d3557] flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 0" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polygon points="10 8 16 12 10 16 10 8"></polygon>
+          </svg>
+          比賽管理 <span className="text-xl text-[#457b9d] ml-2">{globalGroupIndicator}</span>
         </h2>
         {isCoachOrAdmin && (
           <Dialog open={isMatchModalOpen} onOpenChange={setIsMatchModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleAddMatch} className="bg-primary hover:bg-primary/90">
+              <Button onClick={handleAddMatch} className="bg-[#1d3557] hover:bg-[#457b9d] text-white shadow-md transition-colors duration-200">
                 <PlusCircle className="mr-2 h-5 w-5" /> 新增比賽
               </Button>
             </DialogTrigger>
@@ -300,13 +302,13 @@ export function MatchesSection({
         )}
       </div>
 
-      <Card className="mb-6 shadow-lg">
+      <Card className="mb-6 shadow-lg bg-white border border-[#457b9d]/20 overflow-hidden">
         <CardContent className="p-4 md:p-6">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 items-end">
             <div className="space-y-2">
-              <Label htmlFor="match-league-filter">聯賽</Label>
+              <Label htmlFor="match-league-filter" className="text-[#1d3557] font-medium">聯賽</Label>
               <Select value={matchLeagueFilter} onValueChange={setMatchLeagueFilter}>
-                <SelectTrigger id="match-league-filter">
+                <SelectTrigger id="match-league-filter" className="border-[#457b9d]/30 focus:ring-[#457b9d]/20 bg-white">
                   <SelectValue placeholder="所有聯賽" />
                 </SelectTrigger>
                 <SelectContent>
@@ -318,28 +320,29 @@ export function MatchesSection({
               </Select>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="match-month-filter">月份</Label>
+              <Label htmlFor="match-month-filter" className="text-[#1d3557] font-medium">月份</Label>
               <Input
                 type="month"
                 id="match-month-filter"
                 value={matchMonthFilter}
                 onChange={(e) => setMatchMonthFilter(e.target.value)}
+                className="border-[#457b9d]/30 focus:ring-[#457b9d]/20 focus:border-[#457b9d] bg-white"
               />
             </div>
           </div>
 
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-[#f1faee]">
                 <TableRow>
-                  <TableHead className="w-[30px] p-1 text-center"></TableHead>
-                  <TableHead>日期</TableHead>
-                  <TableHead>時間</TableHead>
-                  <TableHead>聯賽</TableHead>
-                  <TableHead>對手</TableHead>
-                  <TableHead>地點</TableHead>
-                  {currentUserRole === USER_ROLES.PLAYER && <TableHead className="text-center w-[80px]">出席</TableHead>}
-                  {isCoachOrAdmin && <TableHead className="text-right">操作</TableHead>}
+                  <TableHead className="w-[30px] p-1 text-center text-[#1d3557] font-semibold"></TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">日期</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">時間</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">聯賽</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">對手</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">地點</TableHead>
+                  {currentUserRole === USER_ROLES.PLAYER && <TableHead className="text-center w-[80px] text-[#1d3557] font-semibold">出席</TableHead>}
+                  {isCoachOrAdmin && <TableHead className="text-right text-[#1d3557] font-semibold">操作</TableHead>}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -360,14 +363,14 @@ export function MatchesSection({
                       className={cn({
                         'bg-[var(--conflict-error-bg)]': conflict.type === 'overlap',
                         'bg-[var(--conflict-warning-bg)]': conflict.type === 'sameday',
-                        // Removed: 'hidden-for-player-role': currentUserRole === USER_ROLES.PLAYER && !isCoachOrAdmin && isActionDisabled, 
+                        'hover:bg-[#f8f9fa] border-b border-[#e9ecef]': true
                       })}
                     >
                       <TableCell className="p-1 text-center">
                         {conflict.type === 'overlap' && <XCircle className="h-5 w-5 text-destructive inline-block" />}
                         {conflict.type === 'sameday' && <AlertTriangle className="h-5 w-5 text-yellow-500 inline-block" />}
                       </TableCell>
-                      <TableCell>{match.date}</TableCell>
+                      <TableCell className="font-medium text-[#1d3557]">{match.date}</TableCell>
                       <TableCell>{match.startTime}</TableCell>
                       <TableCell>{league ? league.name : 'N/A'}</TableCell>
                       <TableCell>{opponent ? opponent.name : 'N/A'}</TableCell>
@@ -381,6 +384,7 @@ export function MatchesSection({
                               checked={isPlayerAvailable}
                               onCheckedChange={(checked) => handleAvailabilityChange(match.id, currentUserId, !!checked)}
                               aria-label={`Mark availability for match on ${match.date}`}
+                              className="border-[#457b9d]/50 text-[#1d3557] focus:ring-[#457b9d]/30 data-[state=checked]:bg-[#1d3557] data-[state=checked]:border-[#1d3557]"
                             />
                           )}
                         </TableCell>
@@ -388,29 +392,59 @@ export function MatchesSection({
 
                       {isCoachOrAdmin && (
                         <TableCell className="text-right">
-                          <div className="flex justify-end space-x-1">
-                            <Button variant="ghost" size="icon" onClick={() => handleEditMatch(match)} className="hover:text-primary">
+                          <div className="flex justify-end space-x-1">                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => handleEditMatch(match)} 
+                              className="hover:text-[#457b9d] hover:bg-[#457b9d]/10 rounded-full transition-colors duration-200"
+                              title="編輯比賽"
+                            >
                               <Edit3 className="h-4 w-4" />
                             </Button>
                             <Button 
                               variant="ghost" 
                               size="icon" 
                               onClick={() => openRosterModal(match)} 
-                              className="hover:text-yellow-500 relative"
+                              className={cn(
+                                "hover:text-[#e9c46a] hover:bg-[#e9c46a]/10 relative rounded-full transition-colors duration-200", 
+                                { "text-[#e63946]": showRosterWarning }
+                              )}
                               title={`管理陣容 (${currentRosterCount} / ${requiredPlayers > 0 ? requiredPlayers : 'N/A'})`}
                             >
                               <Users className="h-4 w-4" />
                               {currentRosterCount > 0 && (
-                                <span className="absolute -top-1.5 -right-1.5 bg-accent text-accent-foreground text-xs w-4 h-4 rounded-full flex items-center justify-center border border-background">
+                                <span className="absolute -top-1.5 -right-1.5 bg-[#e9c46a] text-[#1d3557] text-xs w-4 h-4 rounded-full flex items-center justify-center border border-white font-medium">
                                   {currentRosterCount}
                                 </span>
                               )}
                               {showRosterWarning && (
-                                <AlertTriangle className="absolute -bottom-1 -right-1 h-3.5 w-3.5 text-destructive fill-destructive/70" />
+                                <span className="absolute -bottom-1 -right-1 h-4 w-4 bg-white rounded-full flex items-center justify-center">
+                                  <AlertTriangle className="h-3 w-3 text-[#e63946]" />
+                                </span>
                               )}
-                            </Button>                            <Button variant="ghost" size="icon" onClick={() => openStatsModal(match)} className="btn-success hover:text-green-600">
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => openStatsModal(match)} 
+                              className="hover:text-[#2a9d8f] hover:bg-[#2a9d8f]/10 rounded-full transition-colors duration-200"
+                              title="比賽統計"
+                            >
                               <BarChart2 className="h-4 w-4" />
-                            </Button>                            <Button variant="ghost" size="icon" onClick={() => handleDeleteMatch(match.id)} className="hover:text-destructive">
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="icon" 
+                              onClick={() => {
+                                onOpenConfirmDialog(
+                                  "確認刪除比賽", 
+                                  `確定要刪除 ${match.date} 與 ${opponent?.name || 'N/A'} 的比賽嗎？此操作無法撤銷。`, 
+                                  () => handleDeleteMatch(match.id)
+                                );
+                              }} 
+                              className="hover:text-[#e63946] hover:bg-[#e63946]/10 rounded-full transition-colors duration-200"
+                              title="刪除比賽"
+                            >
                               <Trash2 className="h-4 w-4" />
                             </Button>
                           </div>

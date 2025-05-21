@@ -2,6 +2,41 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .card-hover {
+    @apply transition-all duration-300 hover:shadow-lg hover:-translate-y-1;
+  }
+  
+  .section-title {
+    @apply text-lg font-semibold text-[#1d3557] flex items-center gap-2 mb-3;
+  }
+  
+  .status-badge {
+    @apply inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium;
+  }
+  
+  .status-badge-success {
+    @apply bg-green-100 text-green-800;
+  }
+  
+  .status-badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+  }
+  
+  .status-badge-error {
+    @apply bg-red-100 text-red-800;
+  }
+  
+  .fade-in {
+    animation: fadeIn 0.3s ease-in-out;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 @layer base {
   :root {
     /* Light Theme - Adjusted to match "桃園獵鷹宇宙" app */
@@ -160,4 +195,78 @@
 
 .hidden-for-player-role {
   display: none !important;
+}
+
+/* 桃園獵鷹宇宙管理平台主題色彩 */
+:root {
+  --tyfc-primary: #1d3557;  /* 主深藍色 */
+  --tyfc-secondary: #457b9d;  /* 主淺藍色 */
+  --tyfc-accent: #e63946;  /* 強調色(紅色) */
+  --tyfc-light: #f1faee;  /* 淺色背景 */
+  --tyfc-muted: #a8dadc;  /* 中間色調 */
+}
+
+/* 登入頁面樣式 */
+.login-page-gradient {
+  background-image: linear-gradient(to bottom right, var(--tyfc-primary), var(--tyfc-secondary), var(--tyfc-primary)) !important;
+}
+
+.login-card {
+  border-color: rgba(69, 123, 157, 0.2) !important;
+  box-shadow: 0 10px 25px rgba(29, 53, 87, 0.3) !important;
+}
+
+.login-header {
+  background-color: var(--tyfc-primary) !important;
+}
+
+.login-input {
+  border-color: rgba(69, 123, 157, 0.5) !important;
+}
+
+.login-input:focus {
+  border-color: var(--tyfc-secondary) !important;
+  box-shadow: 0 0 0 2px rgba(69, 123, 157, 0.3) !important;
+}
+
+.login-button {
+  background-color: var(--tyfc-primary) !important;
+  transition: all 0.3s ease !important;
+}
+
+.login-button:hover {
+  background-color: var(--tyfc-secondary) !important;
+}
+
+/* 管理頁面樣式 */
+.admin-card {
+  border-color: rgba(69, 123, 157, 0.2) !important;
+  box-shadow: 0 4px 12px rgba(29, 53, 87, 0.15) !important;
+}
+
+.header-nav {
+  background-color: var(--tyfc-primary) !important;
+}
+
+.table-header {
+  background-color: var(--tyfc-light) !important;
+  color: var(--tyfc-primary) !important;
+}
+
+.action-button {
+  background-color: var(--tyfc-secondary) !important;
+  color: white !important;
+}
+
+.action-button:hover {
+  background-color: rgba(69, 123, 157, 0.9) !important;
+}
+
+.delete-button {
+  background-color: var(--tyfc-accent) !important;
+  color: white !important;
+}
+
+.delete-button:hover {
+  background-color: rgba(230, 57, 70, 0.9) !important;
 }

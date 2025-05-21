@@ -1,6 +1,5 @@
-
 "use client";
-import type { UserRole, SectionName } from '@/lib/types';
+import type { SectionName } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/auth-context';
@@ -26,21 +25,19 @@ export function Header({
 }: HeaderProps) {
   const { currentUserRole, username, logout, isAuthenticated } = useAuth();
 
-  return (
-    <header className="bg-primary text-primary-foreground shadow-md fixed top-0 left-0 right-0 z-50 py-3 md:py-2">
+  return (    <header className="bg-[#1d3557] text-white shadow-md fixed top-0 left-0 right-0 z-50 py-3 md:py-2 header-nav">
       <div className="container mx-auto px-4 flex flex-col md:flex-row justify-between items-center">
-        <div className="text-2xl font-bold mb-2 md:mb-0">桃園獵鷹宇宙</div>
-        {isAuthenticated && (
-          <nav>
-            <ul className="flex flex-wrap justify-center md:justify-start items-center space-x-1 md:space-x-2">
+        <div className="text-2xl font-bold mb-2 md:mb-0 text-[#f1faee]">桃園獵鷹宇宙</div>
+        {isAuthenticated && (          <nav className="w-full md:w-auto">
+            <ul className="flex flex-wrap justify-center md:justify-start items-center gap-1 md:gap-0 md:space-x-2">
               {navItems.map((item) => (
-                <li key={item.id}>
+                <li key={item.id} className="mb-1 md:mb-0">
                   <Button
                     variant="ghost"
                     onClick={() => onTabChange(item.id)}
                     className={cn(
-                      "text-primary-foreground hover:bg-primary/80 hover:text-accent-foreground px-2 py-1 md:px-3 md:py-1.5",
-                      activeTab === item.id ? "border-b-2 border-accent text-accent" : "" // Use accent for active tab indicator
+                      "text-[#f1faee] hover:bg-[#457b9d]/40 hover:text-[#f1faee] px-2 py-1 md:px-3 md:py-1.5 transition-colors duration-200 text-sm md:text-base",
+                      activeTab === item.id ? "border-b-2 border-[#e63946] text-[#e9c46a] font-medium" : ""
                     )}
                   >
                     {item.label}
@@ -49,31 +46,31 @@ export function Header({
               ))}
               {/* Add Admin link if user is admin */}
               {currentUserRole === USER_ROLES.ADMIN && (
-                <li>
-                  <Link href="/admin" passHref legacyBehavior>
+                <li className="mb-1 md:mb-0">
+                  <Link href="/admin" className="inline-block">
                     <Button
                       variant="ghost"
-                      className="text-primary-foreground hover:bg-primary/80 hover:text-accent-foreground px-2 py-1 md:px-3 md:py-1.5"
+                      className="text-[#f1faee] hover:bg-[#457b9d]/40 hover:text-[#f1faee] px-2 py-1 md:px-3 md:py-1.5 transition-colors duration-200 text-sm md:text-base"
                     >
-                      <a>管理後台</a>
+                      管理後台
                     </Button>
                   </Link>
                 </li>
               )}
-              <li className="flex gap-1 md:gap-2 mt-2 md:mt-0 md:ml-4 items-center">
-                <span className="text-sm hidden md:inline">
-                  角色: {currentUserRole} | 使用者: {username}
+            </ul>
+            <div className="flex justify-center md:justify-end mt-2 md:mt-3 items-center">
+                <span className="text-xs md:text-sm text-[#f1faee]/80 mr-2">
+                  {username} <span className="hidden md:inline">({currentUserRole})</span>
                 </span>
                 <Button
                   size="sm"
                   onClick={logout}
-                  className="bg-accent text-accent-foreground hover:bg-accent/90 font-semibold"
+                  className="bg-[#e63946] text-white hover:bg-[#e63946]/90 font-semibold transition-colors duration-200 text-xs md:text-sm"
                 >
-                  <LogOut className="mr-1.5 h-4 w-4" />
+                  <LogOut className="mr-1 h-3 w-3 md:h-4 md:w-4" />
                   登出
                 </Button>
-              </li>
-            </ul>
+            </div>
           </nav>
         )}
       </div>

@@ -11,7 +11,7 @@ import { PlayerForm } from '@/components/forms/player-form';
 import { Badge } from '@/components/ui/badge';
 import { PlusCircle, Edit3, Trash2 } from 'lucide-react';
 import { useAuth } from '@/contexts/auth-context';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-simple-toast"; // 使用新的簡化版 toast 系統
 
 // 導入API服務
 import {
@@ -37,9 +37,8 @@ export function PlayersSection({
   onOpenConfirmDialog,
   filteredPlayers,
   globalGroupIndicator,
-}: PlayersSectionProps) {
-  const { authToken } = useAuth();
-  const { toast } = useToast();
+}: PlayersSectionProps) {  const { authToken } = useAuth();
+  const { addToast } = useToast(); // 使用新的 toast API
   
   const [isPlayerModalOpen, setIsPlayerModalOpen] = useState(false);
   const [editingPlayer, setEditingPlayer] = useState<Player | undefined>(undefined);
@@ -95,10 +94,10 @@ export function PlayersSection({
               console.warn('更新球員聯賽時出錯：', leagueResponse.error);
             }
           }
-          
-          toast({
+            addToast({
             title: "更新成功",
-            description: `球員「${updatedPlayer.name}」已更新`,
+            message: `球員「${updatedPlayer.name}」已更新`,
+            type: "success"
           });
         }
       } else {
@@ -124,10 +123,10 @@ export function PlayersSection({
               console.warn('設定球員聯賽時出錯：', leagueResponse.error);
             }
           }
-          
-          toast({
+            addToast({
             title: "創建成功",
-            description: `球員「${updatedPlayer.name}」已添加`,
+            message: `球員「${updatedPlayer.name}」已添加`,
+            type: "success"
           });
         }
       }
@@ -145,11 +144,10 @@ export function PlayersSection({
       setIsPlayerModalOpen(false);
       setEditingPlayer(undefined);
     } catch (error) {
-      console.error('處理球員表單提交時出錯：', error);
-      toast({
-        variant: "destructive",
+      console.error('處理球員表單提交時出錯：', error);      addToast({
         title: "操作失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
+        type: "error"
       });
     }
   };
@@ -177,17 +175,16 @@ export function PlayersSection({
             stats: Object.fromEntries(Object.entries(match.stats || {}).filter(([pId]) => pId !== playerId))
           }))
         }));
-        
-        toast({
+          addToast({
           title: "刪除成功",
-          description: `球員已刪除`,
+          message: `球員已刪除`,
+          type: "success"
         });
       } catch (error) {
-        console.error('刪除球員時出錯：', error);
-        toast({
-          variant: "destructive",
+        console.error('刪除球員時出錯：', error);        addToast({
           title: "刪除失敗",
-          description: error instanceof Error ? error.message : "發生未知錯誤",
+          message: error instanceof Error ? error.message : "發生未知錯誤",
+          type: "error"
         });
       }
     });
@@ -198,13 +195,19 @@ export function PlayersSection({
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-primary">
-          球員管理 <span className="text-xl text-secondary">{globalGroupIndicator}</span>
+        <h2 className="text-3xl font-bold text-[#1d3557] flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path>
+            <circle cx="9" cy="7" r="4"></circle>
+            <path d="M22 21v-2a4 4 0 0 0-3-3.87"></path>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+          </svg>
+          球員管理 <span className="text-xl text-[#457b9d] ml-2">{globalGroupIndicator}</span>
         </h2>
         {!isActionDisabled && (
           <Dialog open={isPlayerModalOpen} onOpenChange={setIsPlayerModalOpen}>
             <DialogTrigger asChild>
-              <Button onClick={handleAddPlayer} className="bg-primary hover:bg-primary/90">
+              <Button onClick={handleAddPlayer} className="bg-[#1d3557] hover:bg-[#457b9d] text-white shadow-md transition-colors duration-200">
                 <PlusCircle className="mr-2 h-5 w-5" /> 新增球員
               </Button>
             </DialogTrigger>
@@ -223,29 +226,31 @@ export function PlayersSection({
         )}
       </div>
 
-      <Card className="shadow-lg">
+      <Card className="shadow-lg bg-white border border-[#457b9d]/20 overflow-hidden">
         <CardContent className="p-4 md:p-6">
           <div className="overflow-x-auto">
             <Table>
-              <TableHeader>
+              <TableHeader className="bg-[#f1faee]">
                 <TableRow>
-                  <TableHead>姓名</TableHead>
-                  <TableHead>號碼</TableHead>
-                  <TableHead>位置</TableHead>
-                  <TableHead>參與聯賽</TableHead>
-                  <TableHead>狀態</TableHead>
-                  {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
+                  <TableHead className="text-[#1d3557] font-semibold">姓名</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">號碼</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">位置</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">參與聯賽</TableHead>
+                  <TableHead className="text-[#1d3557] font-semibold">狀態</TableHead>
+                  {!isActionDisabled && <TableHead className="text-right text-[#1d3557] font-semibold">操作</TableHead>}
                 </TableRow>
               </TableHeader>
-              <TableBody>                {filteredPlayers.map((player) => (                  <TableRow key={player.id}>
-                    <TableCell>{player.name}</TableCell>
+              <TableBody>
+                {filteredPlayers.map((player) => (
+                  <TableRow key={player.id} className="hover:bg-[#f8f9fa] border-b border-[#e9ecef]">
+                    <TableCell className="font-medium text-[#1d3557]">{player.name}</TableCell>
                     <TableCell>{typeof player.id === 'string' && player.id.includes('_') ? player.id.split('_')[1] : '-'}</TableCell>
                     <TableCell>{player.positions && player.positions.length > 0 ? player.positions[0] : '-'}</TableCell>
                     <TableCell>
                       {player.participatingLeagueIds?.map(leagueId => {
                         const league = appData.leagues.find(l => l.id === leagueId);
                         return league ? (
-                          <Badge key={leagueId} variant="secondary" className="mr-1 mb-1">
+                          <Badge key={leagueId} variant="secondary" className="mr-1 mb-1 bg-[#457b9d]/20 text-[#1d3557] hover:bg-[#457b9d]/30">
                             {league.name}
                           </Badge>
                         ) : null;
@@ -253,16 +258,16 @@ export function PlayersSection({
                     </TableCell>
                     <TableCell>
                       {player.injured === '是' && (
-                        <Badge variant="destructive">受傷</Badge>
+                        <Badge variant="destructive" className="bg-[#e63946] hover:bg-[#e63946]/90">受傷</Badge>
                       )}
                     </TableCell>
                     {!isActionDisabled && (
                       <TableCell className="text-right">
                         <div className="flex justify-end space-x-1">
-                          <Button variant="ghost" size="icon" onClick={() => handleEditPlayer(player)} className="hover:text-primary">
+                          <Button variant="ghost" size="icon" onClick={() => handleEditPlayer(player)} className="hover:text-[#457b9d] hover:bg-[#f1faee] transition-colors duration-200">
                             <Edit3 className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon" onClick={() => handleDeletePlayer(player.id)} className="hover:text-destructive">
+                          <Button variant="ghost" size="icon" onClick={() => handleDeletePlayer(player.id)} className="hover:text-[#e63946] hover:bg-[#f1faee] transition-colors duration-200">
                             <Trash2 className="h-4 w-4" />
                           </Button>
                         </div>
@@ -272,7 +277,7 @@ export function PlayersSection({
                 ))}
               </TableBody>
             </Table>
-            {filteredPlayers.length === 0 && <p className="text-center text-muted-foreground py-4">無符合條件的球員。</p>}
+            {filteredPlayers.length === 0 && <p className="text-center text-[#6c757d] py-4">無符合條件的球員。</p>}
           </div>
         </CardContent>
       </Card>

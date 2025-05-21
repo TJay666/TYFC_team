@@ -43,83 +43,79 @@ export default function LoginPage() {
        setIsLoading(false);
      }
    };
-
   // Render loading state if auth is loading
   if (authLoading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-        <p className="text-gray-400">載入中...</p>
+      <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#1d3557] via-[#457b9d] to-[#1d3557] p-4">
+        <div className="bg-white rounded-lg p-6 shadow-lg">
+          <p className="text-[#1d3557] text-lg font-medium">載入中...</p>
+        </div>
       </div>
     );
-  }
-
-  // Render login form when not loading and not authenticated
+  }  // Render login form when not loading and not authenticated
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-gray-900 via-indigo-900 to-purple-800 p-4">
-      <Card className="w-full max-w-md shadow-2xl bg-background/80 backdrop-blur-md border-primary/50">
-        <CardHeader className="text-center bg-gray-800 text-card-foreground">
-          <div className="mx-auto mb-6">
+    <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-[#1d3557] via-[#457b9d] to-[#1d3557] p-4 login-page-gradient">
+      <Card className="w-full max-w-md shadow-2xl bg-white rounded-lg overflow-hidden border-2 border-[#457b9d]/20 login-card">
+        <CardHeader className="text-center bg-[#1d3557] p-6 login-header">
+          <div className="mx-auto mb-4 bg-white p-2 rounded-full inline-block">
             <Image
               src="/images/taoyuan_universe_logo.png"
               alt="獵鷹 Logo"
-              width={128}
-              height={128}
-              className="rounded-full shadow-lg object-cover"
+              width={120}
+              height={120}
+              className="rounded-full shadow-md object-cover"
               priority
             />
           </div>
           <CardTitle className="text-3xl font-bold text-white">獵鷹登入</CardTitle>
-          <CardDescription className="text-gray-300">歡迎回來！請輸入您的帳號密碼。</CardDescription>
+          <CardDescription className="text-[#f1faee]/90 mt-2">歡迎回來！請輸入您的帳號密碼。</CardDescription>
         </CardHeader>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-6">
           {/* Login Form */}
-          <form onSubmit={handleLogin} className="space-y-4"> {/* Use handleLogin for form submission */}
+          <form onSubmit={handleLogin} className="space-y-5"> {/* Use handleLogin for form submission */}
             <div className="space-y-2">
-              <Label htmlFor="username" className="text-card-foreground">使用者名稱</Label>              <Input 
+              <Label htmlFor="username" className="text-[#1d3557] font-medium">使用者名稱</Label>              <Input 
                 id="username" 
                 placeholder="請輸入您的帳號" 
                 required
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+                className="bg-white border-2 border-[#457b9d]/50 focus:border-[#457b9d] focus:ring-2 focus:ring-[#457b9d]/30 rounded-md p-2.5 text-[#1d3557] placeholder:text-[#457b9d]/50 login-input"
                 name="username"
                 autoComplete="username"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-card-foreground">密碼</Label>              <Input 
+              <Label htmlFor="password" className="text-[#1d3557] font-medium">密碼</Label>              <Input 
                 id="password" 
                 type="password" 
                 placeholder="請輸入您的密碼" 
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="bg-background/70 border-input text-foreground placeholder:text-muted-foreground"
+                className="bg-white border-2 border-[#457b9d]/50 focus:border-[#457b9d] focus:ring-2 focus:ring-[#457b9d]/30 rounded-md p-2.5 text-[#1d3557] placeholder:text-[#457b9d]/50 login-input"
                 name="password"
                 autoComplete="current-password"
               />
-            </div>
-
-            {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+            </div>            {error && <p className="text-[#e63946] text-sm text-center font-medium">{error}</p>}
             
-            {/* Single Login Button */}
-            <Button type="submit" className="w-full bg-primary text-primary-foreground hover:bg-primary/90 py-3 text-base" disabled={isLoading}>
+            {/* Single Login Button */}            <Button type="submit" className="w-full bg-[#1d3557] hover:bg-[#457b9d] text-white font-semibold py-3 text-base rounded-md transition-colors duration-300 shadow-md login-button" disabled={isLoading}>
                {isLoading ? '登入中...' : '登入'}
             </Button>
           </form>
 
         </CardContent>
-        <CardFooter className="flex flex-col items-center space-y-2">
+        <CardFooter className="flex flex-col items-center space-y-2 pb-5 pt-0">
            <Link href="/register" legacyBehavior>
-             <a className="text-sm text-primary hover:text-primary/80 hover:underline">
+             <a className="text-sm text-[#457b9d] hover:text-[#1d3557] hover:underline transition-colors duration-200 font-medium">
               還沒有帳號嗎？點此註冊
             </a>
           </Link>
            {/* Removed the demo login text */}
         </CardFooter>
       </Card>
-       <footer className="mt-8 text-center text-sm text-gray-300">
-        <p>桃園獵鷹宇宙 &copy; {new Date().getFullYear()}</p>
+      <footer className="mt-8 text-center text-sm text-white/80">
+        <p>TJay &copy; {new Date().getFullYear()}</p>
       </footer>
     </div>
   );

@@ -8,7 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import type { League, Team, AppData } from '@/lib/types';
 import { USER_ROLES } from '@/lib/types';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-simple-toast";
 import { useAuth } from '@/contexts/auth-context';
 
 // 導入API服務
@@ -46,7 +46,7 @@ export function LeaguesSection({
   globalGroupIndicator,
 }: LeaguesSectionProps) {
   const { authToken } = useAuth();
-  const { toast } = useToast();
+  const { addToast } = useToast();
   
   const [isLeagueModalOpen, setIsLeagueModalOpen] = useState(false);
   const [isTeamModalOpen, setIsTeamModalOpen] = useState(false);
@@ -83,10 +83,10 @@ export function LeaguesSection({
         }
         
         if (response.data) {
-          updatedLeague = response.data;
-          toast({
+          updatedLeague = response.data;          addToast({
             title: "更新成功",
-            description: `聯賽「${updatedLeague.name}」已更新`,
+            message: `聯賽「${updatedLeague.name}」已更新`,
+            type: "success"
           });
         }
       } else {
@@ -98,10 +98,10 @@ export function LeaguesSection({
         }
         
         if (response.data) {
-          updatedLeague = response.data;
-          toast({
+          updatedLeague = response.data;          addToast({
             title: "創建成功",
-            description: `聯賽「${updatedLeague.name}」已添加`,
+            message: `聯賽「${updatedLeague.name}」已添加`,
+            type: "success"
           });
         }
       }
@@ -118,13 +118,12 @@ export function LeaguesSection({
       
       setIsLeagueModalOpen(false);
       setEditingLeague(undefined);
-      
-    } catch (error) {
+        } catch (error) {
       console.error('處理聯賽表單提交時出錯：', error);
-      toast({
-        variant: "destructive",
+      addToast({
+        type: "error",
         title: "操作失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
       });
     }
   };
@@ -150,17 +149,17 @@ export function LeaguesSection({
           }));
           return { ...prev, leagues: newLeagues, matches: newMatches, players: newPlayers };
         });
-        
-        toast({
+          addToast({
           title: "刪除成功",
-          description: `聯賽已刪除`,
+          message: `聯賽已刪除`,
+          type: "success"
         });
       } catch (error) {
         console.error('刪除聯賽時出錯：', error);
-        toast({
-          variant: "destructive",
+        addToast({
+          type: "error",
           title: "刪除失敗",
-          description: error instanceof Error ? error.message : "發生未知錯誤",
+          message: error instanceof Error ? error.message : "發生未知錯誤",
         });
       }
     });
@@ -190,10 +189,10 @@ export function LeaguesSection({
         }
         
         if (response.data) {
-          updatedTeam = response.data;
-          toast({
+          updatedTeam = response.data;          addToast({
             title: "更新成功",
-            description: `球隊「${updatedTeam.name}」已更新`,
+            message: `球隊「${updatedTeam.name}」已更新`,
+            type: "success"
           });
         }
       } else {
@@ -205,10 +204,10 @@ export function LeaguesSection({
         }
         
         if (response.data) {
-          updatedTeam = response.data;
-          toast({
+          updatedTeam = response.data;          addToast({
             title: "創建成功",
-            description: `球隊「${updatedTeam.name}」已添加`,
+            message: `球隊「${updatedTeam.name}」已添加`,
+            type: "success"
           });
         }
       }
@@ -225,13 +224,12 @@ export function LeaguesSection({
       
       setIsTeamModalOpen(false);
       setEditingTeam(undefined);
-      
-    } catch (error) {
+        } catch (error) {
       console.error('處理球隊表單提交時出錯：', error);
-      toast({
-        variant: "destructive",
+      addToast({
+        type: "error",
         title: "操作失敗",
-        description: error instanceof Error ? error.message : "發生未知錯誤",
+        message: error instanceof Error ? error.message : "發生未知錯誤",
       });
     }
   };
@@ -254,17 +252,17 @@ export function LeaguesSection({
           );
           return { ...prev, teams: newTeams, matches: newMatches };
         });
-        
-        toast({
+          addToast({
           title: "刪除成功",
-          description: `球隊已刪除`,
+          message: `球隊已刪除`,
+          type: "success"
         });
       } catch (error) {
         console.error('刪除球隊時出錯：', error);
-        toast({
-          variant: "destructive",
+        addToast({
+          type: "error",
           title: "刪除失敗",
-          description: error instanceof Error ? error.message : "發生未知錯誤",
+          message: error instanceof Error ? error.message : "發生未知錯誤",
         });
       }
     });
@@ -274,22 +272,29 @@ export function LeaguesSection({
 
   return (
     <div>
-      <h2 className="text-3xl font-bold text-primary mb-6">
-        聯賽及球隊管理 <span className="text-xl text-secondary">{globalGroupIndicator}</span>
-      </h2>
-      <Tabs defaultValue="leagues-content-panel" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 mb-4">
-          <TabsTrigger value="leagues-content-panel">聯賽管理</TabsTrigger>
-          <TabsTrigger value="teams-content-panel">對手球隊管理</TabsTrigger>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-3xl font-bold text-[#1d3557] flex items-center">
+          <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2">
+            <path d="M18 8a5 5 0 0 0-10 0v4a5 5 0 0 0 10 0V8Z"></path>
+            <path d="M10 8v4a3 3 0 1 0 6 0V8a5 5 0 0 0-10 0v4a7 7 0 1 0 14 0V8h-2"></path>
+          </svg>
+          聯賽管理 <span className="text-xl text-[#457b9d] ml-2">{globalGroupIndicator}</span>
+        </h2>
+      </div>
+
+      <Tabs defaultValue="leagues-content-panel">
+        <TabsList className="grid w-full grid-cols-2 mb-4 bg-[#f1faee] p-1 rounded-lg border border-[#457b9d]/20">
+          <TabsTrigger value="leagues-content-panel" className="data-[state=active]:bg-[#1d3557] data-[state=active]:text-[#f1faee]">聯賽管理</TabsTrigger>
+          <TabsTrigger value="teams-content-panel" className="data-[state=active]:bg-[#1d3557] data-[state=active]:text-[#f1faee]">對手球隊管理</TabsTrigger>
         </TabsList>
 
         <TabsContent value="leagues-content-panel">
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white border border-[#457b9d]/20 overflow-hidden">
             <CardContent className="p-4 md:p-6">
               {!isActionDisabled && (
                 <Dialog open={isLeagueModalOpen} onOpenChange={setIsLeagueModalOpen}>
                   <DialogTrigger asChild>
-                    <Button onClick={handleAddLeague} className="mb-4 bg-primary hover:bg-primary/90">
+                    <Button onClick={handleAddLeague} className="mb-4 bg-[#1d3557] hover:bg-[#457b9d] text-white shadow-md transition-colors duration-200">
                       <PlusCircle className="mr-2 h-5 w-5" /> 新增聯賽
                     </Button>
                   </DialogTrigger>
@@ -303,29 +308,29 @@ export function LeaguesSection({
               )}
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-[#f1faee]">
                     <TableRow>
-                      <TableHead>聯賽名稱</TableHead>
-                      <TableHead>組別-級別U</TableHead>
-                      <TableHead>比賽賽制</TableHead>
-                      <TableHead>備註</TableHead>
-                      {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
+                      <TableHead className="text-[#1d3557] font-semibold">聯賽名稱</TableHead>
+                      <TableHead className="text-[#1d3557] font-semibold">組別-級別U</TableHead>
+                      <TableHead className="text-[#1d3557] font-semibold">比賽賽制</TableHead>
+                      <TableHead className="text-[#1d3557] font-semibold">備註</TableHead>
+                      {!isActionDisabled && <TableHead className="text-right text-[#1d3557] font-semibold">操作</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {filteredLeagues.map((league) => (
-                      <TableRow key={league.id}>
-                        <TableCell>{league.name}</TableCell>
+                      <TableRow key={league.id} className="hover:bg-[#f8f9fa] border-b border-[#e9ecef]">
+                        <TableCell className="font-medium text-[#1d3557]">{league.name}</TableCell>
                         <TableCell>{league.group} - {league.levelU}</TableCell>
                         <TableCell>{league.format}</TableCell>
                         <TableCell>{league.notes}</TableCell>
                         {!isActionDisabled && (
                           <TableCell className="text-right">
                              <div className="flex justify-end space-x-1">
-                                <Button variant="ghost" size="icon" onClick={() => handleEditLeague(league)} className="hover:text-primary">
+                                <Button variant="ghost" size="icon" onClick={() => handleEditLeague(league)} className="hover:text-[#457b9d] hover:bg-[#f1faee] transition-colors duration-200">
                                   <Edit3 className="h-4 w-4" />
                                 </Button>
-                                <Button variant="ghost" size="icon" onClick={() => handleDeleteLeague(league.id)} className="hover:text-destructive">
+                                <Button variant="ghost" size="icon" onClick={() => handleDeleteLeague(league.id)} className="hover:text-[#e63946] hover:bg-[#f1faee] transition-colors duration-200">
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
@@ -335,19 +340,19 @@ export function LeaguesSection({
                     ))}
                   </TableBody>
                 </Table>
-                {filteredLeagues.length === 0 && <p className="text-center text-muted-foreground py-4">無符合條件的聯賽。</p>}
+                {filteredLeagues.length === 0 && <p className="text-center text-[#6c757d] py-4">無符合條件的聯賽。</p>}
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         <TabsContent value="teams-content-panel">
-          <Card className="shadow-lg">
+          <Card className="shadow-lg bg-white border border-[#457b9d]/20 overflow-hidden">
             <CardContent className="p-4 md:p-6">
               {!isActionDisabled && (
                 <Dialog open={isTeamModalOpen} onOpenChange={setIsTeamModalOpen}>
                   <DialogTrigger asChild>
-                    <Button onClick={handleAddTeam} className="mb-4 bg-primary hover:bg-primary/90">
+                    <Button onClick={handleAddTeam} className="mb-4 bg-[#1d3557] hover:bg-[#457b9d] text-white shadow-md transition-colors duration-200">
                      <PlusCircle className="mr-2 h-5 w-5" /> 新增對手球隊
                     </Button>
                   </DialogTrigger>
@@ -361,25 +366,25 @@ export function LeaguesSection({
               )}
               <div className="overflow-x-auto">
                 <Table>
-                  <TableHeader>
+                  <TableHeader className="bg-[#f1faee]">
                     <TableRow>
-                      <TableHead>球隊名稱</TableHead>
-                      <TableHead>對戰筆記</TableHead>
-                     {!isActionDisabled && <TableHead className="text-right">操作</TableHead>}
+                      <TableHead className="text-[#1d3557] font-semibold">球隊名稱</TableHead>
+                      <TableHead className="text-[#1d3557] font-semibold">對戰筆記</TableHead>
+                      {!isActionDisabled && <TableHead className="text-right text-[#1d3557] font-semibold">操作</TableHead>}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {appData.teams.map((team) => (
-                      <TableRow key={team.id}>
-                        <TableCell>{team.name}</TableCell>
+                      <TableRow key={team.id} className="hover:bg-[#f8f9fa] border-b border-[#e9ecef]">
+                        <TableCell className="font-medium text-[#1d3557]">{team.name}</TableCell>
                         <TableCell>{team.notes}</TableCell>
                         {!isActionDisabled && (
                           <TableCell className="text-right">
                             <div className="flex justify-end space-x-1">
-                              <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)} className="hover:text-primary">
+                              <Button variant="ghost" size="icon" onClick={() => handleEditTeam(team)} className="hover:text-[#457b9d] hover:bg-[#f1faee] transition-colors duration-200">
                                 <Edit3 className="h-4 w-4" />
                               </Button>
-                              <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team.id)} className="hover:text-destructive">
+                              <Button variant="ghost" size="icon" onClick={() => handleDeleteTeam(team.id)} className="hover:text-[#e63946] hover:bg-[#f1faee] transition-colors duration-200">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </div>
@@ -389,7 +394,7 @@ export function LeaguesSection({
                     ))}
                   </TableBody>
                 </Table>
-                {appData.teams.length === 0 && <p className="text-center text-muted-foreground py-4">無球隊資料。</p>}
+                {appData.teams.length === 0 && <p className="text-center text-[#6c757d] py-4">無球隊資料。</p>}
               </div>
             </CardContent>
           </Card>

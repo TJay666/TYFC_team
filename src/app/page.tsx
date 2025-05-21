@@ -9,7 +9,7 @@ import { LeaguesSection } from '@/components/sections/leagues-section';
 import { PlayersSection } from '@/components/sections/players-section';
 import { StatisticsSection } from '@/components/sections/statistics-section';
 import { ConfirmDialog } from '@/components/common/confirm-dialog';
-import { useToast } from "@/hooks/use-toast";
+import { useToast } from "@/hooks/use-simple-toast"; // 使用新的簡化版 toast 系統
 import { initialDb } from '@/lib/data'; // 仍然保留作為預設或備用資料
 import { 
   USER_ROLES, 
@@ -53,7 +53,7 @@ export default function HomePage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { toast } = useToast();
+  const { addToast } = useToast();
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {
@@ -111,22 +111,20 @@ export default function HomePage() {
           
           // 標記數據已加載
           dataLoaded.current = true;
-        }
-      } catch (err) {
+        }      } catch (err) {
         console.error('加載數據失敗:', err);
         setError(err instanceof Error ? err.message : '加載資料時發生未知錯誤');
-        toast({
-          variant: "destructive",
+        addToast({
+          type: "error",
           title: "資料載入失敗",
-          description: "無法從伺服器獲取數據，請稍後再試。",
+          message: "無法從伺服器獲取數據，請稍後再試。",
         });
       } finally {
         setLoading(false);
       }
-    };
-    
+    };    
     loadData();
-  }, [isAuthenticated, authToken, toast]);
+  }, [isAuthenticated, authToken, addToast]);
 
   useEffect(() => {
     if (selectedGroup !== "all") {
@@ -152,7 +150,7 @@ export default function HomePage() {
   const handleConfirmDialogConfirm = () => {
     confirmDialogProps.onConfirm();
     setIsConfirmDialogOpen(false);
-    toast({ title: "操作成功", description: "項目已更新/刪除。" });
+    addToast({ title: "操作成功", message: "項目已更新/刪除。", type: "success" });
   };
   
   const globalGroupIndicatorText = useMemo(() => {
@@ -281,13 +279,12 @@ export default function HomePage() {
       <Header
         activeTab={activeTab}
         onTabChange={setActiveTab}
-      />
-      <main className="flex-grow container mx-auto px-4 pt-[120px] md:pt-[80px] pb-8">
+      />      <main className="flex-grow container mx-auto px-4 pt-[120px] md:pt-[80px] pb-12">
         {error && (
-          <Alert variant="destructive" className="mb-4">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>錯誤</AlertTitle>
-            <AlertDescription>
+          <Alert variant="destructive" className="mb-6 shadow-lg animate-in fade-in">
+            <AlertCircle className="h-5 w-5" />
+            <AlertTitle className="font-semibold">系統錯誤</AlertTitle>
+            <AlertDescription className="mt-1">
               {error}
             </AlertDescription>
           </Alert>
@@ -301,7 +298,18 @@ export default function HomePage() {
           availableLevelUOptions={availableLevelUOptions}
         />
         
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SectionName)} className="w-full">
+        <div className="bg-gradient-to-r from-[#1d3557]/5 to-[#457b9d]/5 p-1 rounded-xl mb-4">
+          <h1 className="text-2xl font-bold text-[#1d3557] ml-3 flex items-center">
+            <img 
+              src="/images/taoyuan_universe_logo.png" 
+              alt="桃園獵鷹宇宙" 
+              className="h-8 w-8 mr-2 inline-block" 
+            />
+            桃園獵鷹宇宙足球管理系統
+          </h1>
+        </div>
+        
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as SectionName)} className="w-full animate-in fade-in">
           <TabsContent value="matches">
             <MatchesSection 
               appData={appData} 
