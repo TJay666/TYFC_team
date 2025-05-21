@@ -5,6 +5,7 @@ from .views import RegisterView # Explicitly import RegisterView
 
 urlpatterns = [
     path('users/', views.user_list, name='user_list'),
+    path('users/me/', views.current_user, name='current_user'),
     path('users/<int:user_id>/role/', views.update_user_role, name='update_user_role'),
     path('register/', RegisterView.as_view(), name='register'), # Add register URL
 ]
