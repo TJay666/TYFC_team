@@ -1,0 +1,17 @@
+{
+  "Tailwind @apply": {
+    "prefix": "@apply",
+    "body": ["@apply $1;"],
+    "description": "Tailwind @apply directive"
+  },
+  "Tailwind @layer": {
+    "prefix": "@layer",
+    "body": ["@layer $1 {", "  $2", "}"],
+    "description": "Tailwind @layer directive"
+  },
+  "Tailwind @screen": {
+    "prefix": "@screen",
+    "body": ["@screen $1 {", "  $2", "}"],
+    "description": "Tailwind @screen directive"
+  }
+}

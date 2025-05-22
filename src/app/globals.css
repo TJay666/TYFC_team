@@ -1,3 +1,9 @@
+/* 
+ * This file uses Tailwind CSS directives 
+ * VS Code may show warnings for @tailwind/@apply directives, but they are valid
+ * ---
+ * @tailwindcss
+ */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
