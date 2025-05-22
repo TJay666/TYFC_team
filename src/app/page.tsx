@@ -9,7 +9,7 @@ import { LeaguesSection } from '@/components/sections/leagues-section';
 import { PlayersSection } from '@/components/sections/players-section';
 import { StatisticsSection } from '@/components/sections/statistics-section';
 import { ConfirmDialog } from '@/components/common/confirm-dialog';
-import { useToast } from "@/hooks/use-simple-toast"; // 使用新的簡化版 toast 系統
+// 初始化 Toast 的導入已被移至 useEffect 中，以避免服務器端初始化問題
 import { initialDb } from '@/lib/data'; // 仍然保留作為預設或備用資料
 import { 
   USER_ROLES, 
@@ -48,12 +48,32 @@ export default function HomePage() {
 
   const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
   const [confirmDialogProps, setConfirmDialogProps] = useState({ title: "", description: "", onConfirm: () => {} });
-  
-  // 數據加載狀態
+    // 數據加載狀態
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const { addToast } = useToast();
+  // 使用一個ref來安全地存儲toast函數
+  const toastRef = React.useRef<any>(null);
+
+  // 只在客戶端初始化toast
+  useEffect(() => {
+    try {
+      // 只在客戶端環境中使用useToast
+      const { addToast: clientAddToast } = useToast();
+      toastRef.current = clientAddToast;
+    } catch (e) {
+      console.error("無法初始化toast系統", e);
+    }
+  }, []);
+
+  // 建立一個安全的toast函數，避免服務器端渲染問題
+  const addToast = React.useCallback((toastProps: any) => {
+    if (toastRef.current) {
+      toastRef.current(toastProps);
+    } else {
+      console.log("Toast系統尚未初始化", toastProps);
+    }
+  }, []);
 
   useEffect(() => {
     if (!authLoading && !isAuthenticated) {

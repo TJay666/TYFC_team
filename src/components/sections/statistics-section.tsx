@@ -166,7 +166,7 @@ export function StatisticsSection({
     };
     
     fetchStats();
-  }, [filteredPlayers, filteredMatches, statsLeagueFilter, authToken, toast]);
+  }, [filteredPlayers, filteredMatches, statsLeagueFilter, authToken, addToast]);
 
   const injuredPlayersList = useMemo(() => {
     return filteredPlayers.filter(p => p.injured === '是');

@@ -3,8 +3,9 @@ import { Inter, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 // import { Toaster } from "@/components/ui/toaster"; // 註釋掉有問題的 Toaster
 import { SimpleToaster } from "@/components/ui/simple-toaster"; // 使用我們的簡化版 Toaster
-import { ToastProvider } from "@/hooks/use-simple-toast"; // 使用我們的簡化版 ToastProvider
+import { ToastProvider } from "@/hooks/use-simple-toast"; // 直接導入修復後的 ToastProvider
 import { AuthProvider } from '@/contexts/auth-context';
+import React from 'react';
 
 const inter = Inter({
   variable: '--font-geist-sans',
@@ -33,7 +34,8 @@ export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {  return (
+}>) {
+  return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable} antialiased flex flex-col min-h-screen`}>
         <ToastProvider>
