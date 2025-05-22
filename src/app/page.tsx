@@ -176,9 +176,8 @@ export default function HomePage() {
       
       filteredMatches = appData.matches.filter(m => 
         m.group === selectedGroup || groupFilteredLeagueIds.includes(m.leagueId)
-      );
-      filteredPlayers = appData.players.filter(p => 
-        p.group === selectedGroup || p.participatingLeagueIds.some(plId => groupFilteredLeagueIds.includes(plId))
+      );      filteredPlayers = appData.players.filter(p => 
+        p.group === selectedGroup || (p.participatingLeagueIds && p.participatingLeagueIds.some(plId => groupFilteredLeagueIds.includes(plId)))
       );
 
       if (selectedLevelU !== 'all') {
@@ -187,9 +186,8 @@ export default function HomePage() {
 
         filteredMatches = filteredMatches.filter(m => 
           m.levelU === selectedLevelU || levelFilteredLeagueIds.includes(m.leagueId)
-        );
-        filteredPlayers = filteredPlayers.filter(p => 
-          p.levelU === selectedLevelU || p.participatingLeagueIds.some(plId => levelFilteredLeagueIds.includes(plId))
+        );        filteredPlayers = filteredPlayers.filter(p => 
+          p.levelU === selectedLevelU || (p.participatingLeagueIds && p.participatingLeagueIds.some(plId => levelFilteredLeagueIds.includes(plId)))
         );
       }
     } else if (selectedLevelU !== 'all') { 
@@ -197,9 +195,8 @@ export default function HomePage() {
          const levelFilteredLeagueIds = filteredLeagues.map(l => l.id);
          filteredMatches = appData.matches.filter(m => 
             m.levelU === selectedLevelU || levelFilteredLeagueIds.includes(m.leagueId)
-          );
-         filteredPlayers = appData.players.filter(p => 
-            p.levelU === selectedLevelU || p.participatingLeagueIds.some(plId => levelFilteredLeagueIds.includes(plId))
+          );         filteredPlayers = appData.players.filter(p => 
+            p.levelU === selectedLevelU || (p.participatingLeagueIds && p.participatingLeagueIds.some(plId => levelFilteredLeagueIds.includes(plId)))
           );
     }
     return { matches: filteredMatches, leagues: filteredLeagues, players: filteredPlayers };
